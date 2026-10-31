@@ -222,6 +222,9 @@ GEMINI_API_KEY=your_gemini_api_key
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
 GITHUB_CALLBACK_URL=http://localhost:5000/auth/github/callback
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 ```
 
 ### Notes for environment variables
@@ -229,6 +232,7 @@ GITHUB_CALLBACK_URL=http://localhost:5000/auth/github/callback
 - `JWT_SECRET` must be at least 32 characters long and should be randomly generated.
 - `GEMINI_API_KEY` is required for AI-powered career guidance, ATS reviews, and roadmap generation.
 - GitHub OAuth settings are optional unless you want GitHub sign-in enabled.
+- Cloudinary settings are needed for profile image uploads, including on Vercel.
 - If you are using MongoDB Atlas or another remote database, replace `MONGO_URI` with your connection string.
 
 ## Running the App
@@ -322,7 +326,8 @@ The app exposes a number of routes for different user journeys, including:
 - AI features rely on a valid `GEMINI_API_KEY`.
 - GitHub sign-in will only work when the corresponding OAuth environment variables are configured.
 - MongoDB must be available before the server can boot successfully.
-- Uploaded resumes are stored under the application’s public or upload directories and are processed by the server.
+- Profile images are uploaded to Cloudinary; set the three `CLOUDINARY_*` variables in your local `.env` and deployment environment. Never commit API secrets.
+- Resume uploads are processed by the server and should use storage appropriate to the deployment platform.
 
 ## Future Enhancements
 

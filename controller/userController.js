@@ -2,8 +2,36 @@ import User from '../models/User.js';
 import Application from '../models/Application.js';
 import Job from '../models/Job.js';
 import Internship from '../models/Internship.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 const PROFILE_FIELDS = ['name', 'email', 'targetRole', 'githubLink', 'country', 'language', 'profileImage'];
+
+async function uploadProfileImage(buffer) {
+    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+        throw new Error('Cloudinary is not configured. Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.');
+    }
+
+    cloudinary.config({
+        cloud_name: CLOUDINARY_CLOUD_NAME,
+        api_key: CLOUDINARY_API_KEY,
+        api_secret: CLOUDINARY_API_SECRET
+    });
+
+    return new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+            { folder: 'career-guidance/profile-images', resource_type: 'image' },
+            (error, result) => {
+                if (error) return reject(error);
+                if (!result?.secure_url) {
+                    return reject(new Error('Cloudinary did not return a secure image URL.'));
+                }
+                resolve(result.secure_url);
+            }
+        );
+        stream.end(buffer);
+    });
+}
 
 export function getProfileCompletion(user) {
     const completedFields = PROFILE_FIELDS.filter((field) =>
@@ -126,9 +154,8 @@ export const updateUserProfile = async (req, res) => {
             return res.status(400).send('Name is required.');
         }
 
-        // Agar user ne nayi profile photo select ki hai
         if (req.file) {
-            updateData.profileImage = `/uploads/${req.file.filename}`;
+            updateData.profileImage = await uploadProfileImage(req.file.buffer);
         }
 
         await User.findByIdAndUpdate(req.user._id, updateData, { new: true, runValidators: true });

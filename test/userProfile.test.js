@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ejs from 'ejs';
 import mongoose from 'mongoose';
+import { v2 as cloudinary } from 'cloudinary';
 import User from '../models/User.js';
 import { getProfileCompletion, getUserProfile, updateUserProfile } from '../controller/userController.js';
 
@@ -13,10 +14,21 @@ const viewsDirectory = path.resolve(
 );
 const originalFindById = User.findById;
 const originalFindByIdAndUpdate = User.findByIdAndUpdate;
+const originalUploadStream = cloudinary.uploader.upload_stream;
+const originalCloudinaryEnv = {
+    CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET
+};
 
 afterEach(() => {
     User.findById = originalFindById;
     User.findByIdAndUpdate = originalFindByIdAndUpdate;
+    cloudinary.uploader.upload_stream = originalUploadStream;
+    for (const [key, value] of Object.entries(originalCloudinaryEnv)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+    }
 });
 
 function responseRecorder() {
@@ -114,6 +126,39 @@ test('profile update normalizes a GitHub username and preserves other editable p
         language: 'English'
     });
     assert.deepEqual(options, { new: true, runValidators: true });
+    assert.equal(res.redirectPath, '/users/profile');
+});
+
+test('profile update uploads the image to Cloudinary and stores its secure URL', async () => {
+    process.env.CLOUDINARY_CLOUD_NAME = 'test-cloud';
+    process.env.CLOUDINARY_API_KEY = 'test-key';
+    process.env.CLOUDINARY_API_SECRET = 'test-secret';
+    const imageBuffer = Buffer.from('test-image');
+    let update;
+    User.findByIdAndUpdate = async (id, data) => {
+        update = data;
+    };
+    cloudinary.uploader.upload_stream = (options, callback) => {
+        assert.deepEqual(options, {
+            folder: 'career-guidance/profile-images',
+            resource_type: 'image'
+        });
+        return {
+            end(buffer) {
+                assert.deepEqual(buffer, imageBuffer);
+                callback(null, { secure_url: 'https://res.cloudinary.com/test-cloud/image/upload/profile.png' });
+            }
+        };
+    };
+    const res = responseRecorder();
+
+    await updateUserProfile({
+        user: { _id: new mongoose.Types.ObjectId() },
+        body: { name: 'Student' },
+        file: { buffer: imageBuffer }
+    }, res);
+
+    assert.equal(update.profileImage, 'https://res.cloudinary.com/test-cloud/image/upload/profile.png');
     assert.equal(res.redirectPath, '/users/profile');
 });
 

@@ -6,7 +6,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import ejs from 'ejs';
 import connectDB from './config/db.js';
-import { UPLOAD_DIR } from './config/upload.js';
 
 // Routes Import
 import authRoutes from './routes/authRoutes.js';
@@ -43,7 +42,6 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use('/uploads', express.static(UPLOAD_DIR));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Set View Engine (ejs explicitly register kiya taaki Vercel bundle me include ho)
