@@ -5,8 +5,6 @@ import { extname } from 'node:path';
 import mammoth from 'mammoth';
 import AtsResult from '../models/AtsResult.js';
 
-const { PDFParse } = await import('pdf-parse');
-
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const MAX_RESUME_TEXT_LENGTH = 100_000;
 const MAX_JOB_DESCRIPTION_LENGTH = 20_000;
@@ -102,6 +100,8 @@ async function extractResumeText(file) {
     let text;
 
     if (extension === '.pdf' && file.mimetype === 'application/pdf') {
+        // Lazy import: pdf-parse sirf PDF upload par load hoga (Vercel startup crash se bachne ke liye)
+        const { PDFParse } = await import('pdf-parse');
         const parser = new PDFParse({ data: file.buffer });
         try {
             const parsedPdf = await parser.getText();
