@@ -1,0 +1,110 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+<div class="sidebar-page-content">
+    <main class="container-fluid career-detail">
+        <a href="/careers" class="career-back-link"><i class="ri-arrow-left-line"></i> All career paths</a>
+
+        <header class="career-detail-hero">
+            <div class="career-detail-mark"><i class="ri-compass-3-line"></i></div>
+            <div class="career-detail-intro">
+                <span class="career-eyebrow">CAREER PATH GUIDE</span>
+                <h1><%= career.title %></h1>
+                <p><%= career.description %></p>
+            </div>
+            <div class="career-detail-counts">
+                <div><strong><%= (career.requiredSkills || []).length %></strong><span>skills</span></div>
+                <div><strong><%= (career.learningPath || []).length %></strong><span>learning steps</span></div>
+                <div><strong><%= (career.starterProjects || []).length %></strong><span>starter projects</span></div>
+            </div>
+        </header>
+
+        <div class="row g-4 career-detail-layout">
+            <div class="col-lg-8">
+                <% if (career.learningPath?.length) { %>
+                    <section class="career-detail-panel career-learning-panel">
+                        <div class="career-detail-section-heading">
+                            <span class="career-section-icon"><i class="ri-route-line"></i></span>
+                            <div>
+                                <span class="career-section-kicker">A PRACTICAL START</span>
+                                <h2>Suggested learning path</h2>
+                                <p>A suggested sequence to help you build your foundation step by step.</p>
+                            </div>
+                        </div>
+                        <ol class="career-learning-steps">
+                            <% career.learningPath.forEach((step, index) => { %>
+                                <li>
+                                    <span class="career-step-number"><%= String(index + 1).padStart(2, '0') %></span>
+                                    <span class="career-step-text"><%= step %></span>
+                                    <% if (index < career.learningPath.length - 1) { %><span class="career-step-connector" aria-hidden="true"></span><% } %>
+                                </li>
+                            <% }) %>
+                        </ol>
+                    </section>
+                <% } %>
+
+                <% if (career.typicalResponsibilities?.length) { %>
+                    <section class="career-detail-panel">
+                        <div class="career-detail-section-heading">
+                            <span class="career-section-icon career-section-icon-green"><i class="ri-briefcase-4-line"></i></span>
+                            <div>
+                                <span class="career-section-kicker">THE DAY-TO-DAY</span>
+                                <h2>What this role works on</h2>
+                            </div>
+                        </div>
+                        <ul class="career-responsibility-list">
+                            <% career.typicalResponsibilities.forEach((responsibility) => { %>
+                                <li><i class="ri-check-line"></i><span><%= responsibility %></span></li>
+                            <% }) %>
+                        </ul>
+                    </section>
+                <% } %>
+
+                <% if (career.starterProjects?.length) { %>
+                    <section class="career-detail-panel">
+                        <div class="career-detail-section-heading">
+                            <span class="career-section-icon career-section-icon-amber"><i class="ri-lightbulb-flash-line"></i></span>
+                            <div>
+                                <span class="career-section-kicker">LEARN BY DOING</span>
+                                <h2>Projects to try</h2>
+                                <p>Use these ideas to practise and start building a portfolio.</p>
+                            </div>
+                        </div>
+                        <div class="career-project-grid">
+                            <% career.starterProjects.forEach((project, index) => { %>
+                                <article class="career-project-card">
+                                    <span>PROJECT <%= String(index + 1).padStart(2, '0') %></span>
+                                    <p><%= project %></p>
+                                </article>
+                            <% }) %>
+                        </div>
+                    </section>
+                <% } %>
+            </div>
+
+            <aside class="col-lg-4">
+                <div class="career-detail-panel career-skills-panel">
+                    <span class="career-section-kicker">BUILD YOUR TOOLKIT</span>
+                    <h2>Skills to develop</h2>
+                    <p class="career-panel-description">Start with the fundamentals, then deepen the skills most relevant to your goals.</p>
+                    <% if (career.requiredSkills?.length) { %>
+                        <div class="career-detail-skills">
+                            <% career.requiredSkills.forEach((skill, index) => { %>
+                                <span><i class="<%= index < 3 ? 'ri-checkbox-circle-fill' : 'ri-add-circle-line' %>"></i><%= skill %></span>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted mb-0">No skills have been listed for this career path yet.</p>
+                    <% } %>
+                    <div class="career-roadmap-cta">
+                        <span class="career-cta-icon"><i class="ri-map-2-line"></i></span>
+                        <h3>Make it your own</h3>
+                        <p>Create a roadmap based on your current level and weekly study time.</p>
+                        <a href="/roadmap" class="btn">Build my roadmap <i class="ri-arrow-right-line ms-1"></i></a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+    <%- include('partials/footer') %>
+</div>
+</body>

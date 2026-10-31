@@ -1,0 +1,130 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+<div class="sidebar-page-content">
+    <main class="container-fluid career-explorer">
+        <% const distinctSkillCount = new Set(careers.flatMap((career) => career.requiredSkills || [])).size; %>
+        <section class="career-explorer-hero">
+            <div class="career-hero-copy">
+                <span class="career-eyebrow"><i class="ri-compass-3-line me-1"></i> CAREER EXPLORER</span>
+                <h1>Find a path that <span>fits your future.</span></h1>
+                <p>Explore what different tech roles do, the skills they use, and practical ways to get started.</p>
+                <a class="btn career-hero-button" href="#career-path-list">Explore career paths <i class="ri-arrow-down-line ms-1"></i></a>
+                <div class="career-hero-facts" aria-label="Career catalogue facts">
+                    <div><strong><%= careers.length %></strong><span>career paths</span></div>
+                    <div><strong><%= distinctSkillCount %></strong><span>skill areas</span></div>
+                </div>
+            </div>
+            <aside class="career-hero-aside">
+                <div class="career-orbit career-orbit-one"></div>
+                <div class="career-orbit career-orbit-two"></div>
+                <div class="career-hero-icon"><i class="ri-route-line"></i></div>
+                <span class="career-orbit-tag career-orbit-tag-one"><i class="ri-code-s-slash-line"></i> Build</span>
+                <span class="career-orbit-tag career-orbit-tag-two"><i class="ri-lightbulb-line"></i> Discover</span>
+                <span class="career-orbit-tag career-orbit-tag-three"><i class="ri-rocket-line"></i> Grow</span>
+                <div class="career-hero-note">
+                    <strong>One step at a time</strong>
+                    <span>Compare roles, then choose a practical place to begin.</span>
+                </div>
+            </aside>
+        </section>
+
+        <section id="career-path-list" class="career-list-section">
+            <div class="career-list-heading">
+                <div>
+                    <span class="career-section-kicker">YOUR OPTIONS</span>
+                    <h2>Explore career paths</h2>
+                    <p>Get a clearer picture of the work, skills, and first projects behind each role.</p>
+                </div>
+                <label class="career-search">
+                    <i class="ri-search-line" aria-hidden="true"></i>
+                    <input id="careerSearch" type="search" autocomplete="off" placeholder="Search roles or skills" aria-label="Search career paths by role or skill">
+                    <kbd>/</kbd>
+                </label>
+            </div>
+
+            <% if (careers.length) { %>
+                <div class="career-results-meta">
+                    <span><strong id="careerResultCount"><%= careers.length %></strong> paths to explore</span>
+                    <span>Choose a role to see its guide <i class="ri-arrow-right-line ms-1"></i></span>
+                </div>
+                <div class="row g-4" id="careerGrid">
+                    <% careers.forEach((career, index) => {
+                        const title = career.title.toLowerCase();
+                        let icon = 'ri-compass-3-line';
+                        if (title.includes('data')) icon = 'ri-bar-chart-grouped-line';
+                        else if (title.includes('designer')) icon = 'ri-pencil-ruler-2-line';
+                        else if (title.includes('devops') || title.includes('cloud')) icon = 'ri-cloud-line';
+                        else if (title.includes('qa')) icon = 'ri-checkbox-circle-line';
+                        else if (title.includes('backend')) icon = 'ri-server-line';
+                        else if (title.includes('frontend')) icon = 'ri-window-line';
+                        else if (title.includes('mern')) icon = 'ri-stack-line';
+                        const skills = career.requiredSkills || [];
+                        const searchText = [career.title, career.description, ...skills].join(' ').toLowerCase();
+                    %>
+                        <div class="col-xl-4 col-md-6 career-card-column" data-career-search="<%= searchText %>">
+                            <article class="career-path-card">
+                                <div class="career-card-topline">
+                                    <span class="career-card-icon"><i class="<%= icon %>"></i></span>
+                                    <span class="career-card-number"><%= String(index + 1).padStart(2, '0') %></span>
+                                </div>
+                                <h3><%= career.title %></h3>
+                                <p class="career-card-description"><%= career.description %></p>
+                                <div class="career-card-skill-label"><i class="ri-tools-line me-1"></i> Skills you can build</div>
+                                <div class="career-card-skills">
+                                    <% skills.slice(0, 3).forEach((skill) => { %>
+                                        <span><%= skill %></span>
+                                    <% }) %>
+                                    <% if (skills.length > 3) { %><span class="career-skill-more">+<%= skills.length - 3 %></span><% } %>
+                                </div>
+                                <div class="career-card-footer">
+                                    <span><i class="ri-route-line me-1"></i><%= (career.learningPath || []).length %> learning steps</span>
+                                    <a href="/careers/<%= career._id %>" aria-label="Explore the <%= career.title %> career path">
+                                        View path <i class="ri-arrow-right-up-line"></i>
+                                    </a>
+                                </div>
+                            </article>
+                        </div>
+                    <% }) %>
+                </div>
+                <div class="career-no-results" id="careerNoResults" hidden>
+                    <i class="ri-search-eye-line"></i>
+                    <h3>No matching paths</h3>
+                    <p>Try a different role name or skill.</p>
+                </div>
+            <% } else { %>
+                <div class="career-no-results">
+                    <i class="ri-compass-3-line"></i>
+                    <h3>Career paths are being prepared</h3>
+                    <p>Please check again shortly. Career paths could not be loaded right now.</p>
+                </div>
+            <% } %>
+        </section>
+    </main>
+    <%- include('partials/footer') %>
+</div>
+<script>
+    const careerSearch = document.getElementById('careerSearch');
+    if (careerSearch) {
+        const careerCards = [...document.querySelectorAll('.career-card-column')];
+        const noResults = document.getElementById('careerNoResults');
+        const resultCount = document.getElementById('careerResultCount');
+        careerSearch.addEventListener('input', () => {
+            const query = careerSearch.value.trim().toLowerCase();
+            let visibleCount = 0;
+            careerCards.forEach((card) => {
+                const matches = card.dataset.careerSearch.includes(query);
+                card.hidden = !matches;
+                if (matches) visibleCount += 1;
+            });
+            noResults.hidden = visibleCount !== 0;
+            resultCount.textContent = visibleCount;
+        });
+        careerSearch.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                careerSearch.value = '';
+                careerSearch.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+</script>
+</body>

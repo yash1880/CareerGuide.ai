@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Career Roadmaps - CareerGuide.ai</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="/assets/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <%- include('partials/sidebar') %>
+    <div class="sidebar-page-content">
+
+    <main class="container-fluid py-4 px-4">
+        <div class="mb-4 app-page-heading">
+            <h2 class="fw-bold text-dark mb-1"><i class="ri-road-map-line text-primary me-2"></i>Career Roadmaps</h2>
+            <p class="text-muted mb-0">Get a practical learning plan shaped around your target role, experience, and weekly study time.</p>
+        </div>
+
+        <% if (error) { %>
+            <div class="alert alert-danger" role="alert"><%= error %></div>
+        <% } %>
+
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <h5 class="fw-bold text-dark mb-3">Create your roadmap</h5>
+                    <form action="/roadmap/generate" method="POST">
+                        <div class="mb-3">
+                            <label for="targetRole" class="form-label fw-semibold small text-secondary">Target career / role</label>
+                            <input
+                                type="text"
+                                class="form-control"
+                                id="targetRole"
+                                name="targetRole"
+                                maxlength="100"
+                                placeholder="e.g. Backend Developer"
+                                value="<%= form.targetRole || '' %>"
+                                required
+                            >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="experienceLevel" class="form-label fw-semibold small text-secondary">Current experience level</label>
+                            <select class="form-select" id="experienceLevel" name="experienceLevel" required>
+                                <option value="">Select your level</option>
+                                <% ['Beginner', 'Intermediate', 'Advanced'].forEach(level => { %>
+                                    <option value="<%= level %>" <%= form.experienceLevel === level ? 'selected' : '' %>><%= level %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="currentSkills" class="form-label fw-semibold small text-secondary">Skills you already know (optional)</label>
+                            <textarea
+                                class="form-control"
+                                id="currentSkills"
+                                name="currentSkills"
+                                rows="3"
+                                maxlength="2000"
+                                placeholder="e.g. HTML, CSS, basic JavaScript"><%= form.currentSkills || '' %></textarea>
+                            <div class="form-text">This helps the AI focus more on your skill gaps and avoid repeating basics.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="weeklyHours" class="form-label fw-semibold small text-secondary">Study hours per week</label>
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="weeklyHours"
+                                name="weeklyHours"
+                                min="1"
+                                max="40"
+                                value="<%= form.weeklyHours || 5 %>"
+                                required
+                            >
+                            <div class="form-text">Choose between 1 and 40 hours.</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary rounded-pill fw-semibold py-2">
+                                <i class="ri-magic-line me-1"></i> Generate with AI
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card border-0 shadow-sm rounded-4 p-4">
+                    <h5 class="fw-bold text-dark mb-3">Your saved roadmaps</h5>
+                    <% if (roadmaps && roadmaps.length) { %>
+                        <div class="list-group list-group-flush">
+                            <% roadmaps.forEach(savedRoadmap => { %>
+                                <% const isSelectedRoadmap = Boolean(roadmap && roadmap._id && savedRoadmap._id && roadmap._id.toString() === savedRoadmap._id.toString()); %>
+                                <a
+                                    href="/roadmap/<%= savedRoadmap._id %>"
+                                    class="list-group-item list-group-item-action px-0 <%= isSelectedRoadmap ? 'active' : '' %>"
+                                >
+                                    <span class="d-block fw-semibold"><%= savedRoadmap.careerTitle %></span>
+                                    <span class="small <%= isSelectedRoadmap ? '' : 'text-muted' %>">
+                                        <%= savedRoadmap.experienceLevel %> · <%= savedRoadmap.totalDuration %>
+                                    </span>
+                                </a>
+                            <% }) %>
+                        </div>
+                    <% } else { %>
+                        <p class="text-muted small mb-0">Your generated roadmaps will appear here.</p>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <% if (roadmap) { %>
+                    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                            <div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill mb-2"><%= roadmap.experienceLevel %> · <%= roadmap.weeklyHours %> hrs/week</span>
+                                <h3 class="fw-bold text-dark mb-1"><%= roadmap.careerTitle %></h3>
+                            </div>
+                            <span class="badge bg-light text-dark border px-3 py-2"><i class="ri-time-line me-1"></i><%= roadmap.totalDuration %></span>
+                        </div>
+                        <p class="text-muted mb-0"><%= roadmap.overview %></p>
+                        <% if (roadmap.currentSkills) { %>
+                            <div class="mt-3">
+                                <span class="fw-semibold small text-secondary">Starting skills:</span>
+                                <span class="text-muted small"><%= roadmap.currentSkills %></span>
+                            </div>
+                        <% } %>
+                    </div>
+
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h4 class="fw-bold text-dark mb-0">Your learning plan</h4>
+                        <span class="text-muted small"><%= roadmap.phases.length %> phases</span>
+                    </div>
+
+                    <% roadmap.phases.forEach(phase => { %>
+                        <div class="card border-0 shadow-sm rounded-4 p-4 mb-3">
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                                <h5 class="fw-bold text-dark mb-0">
+                                    <span class="badge bg-primary rounded-circle me-2"><%= phase.stepNumber %></span>
+                                    <%= phase.title %>
+                                </h5>
+                                <span class="badge bg-light text-dark border"><i class="ri-time-line me-1"></i><%= phase.duration %></span>
+                            </div>
+
+                            <h6 class="fw-semibold text-secondary small text-uppercase">What to learn</h6>
+                            <ul class="text-muted ps-3 mb-3">
+                                <% phase.topics.forEach(topic => { %><li class="mb-1"><%= topic %></li><% }) %>
+                            </ul>
+
+                            <% if (phase.outcomes && phase.outcomes.length) { %>
+                                <h6 class="fw-semibold text-secondary small text-uppercase">By the end of this phase, you can</h6>
+                                <ul class="text-muted ps-3 mb-3">
+                                    <% phase.outcomes.forEach(outcome => { %><li class="mb-1"><%= outcome %></li><% }) %>
+                                </ul>
+                            <% } %>
+
+                            <h6 class="fw-semibold text-secondary small text-uppercase">Practice project</h6>
+                            <p class="text-muted mb-3"><%= phase.project %></p>
+
+                            <% if (phase.weeklyPlan && phase.weeklyPlan.length) { %>
+                                <details class="mb-3">
+                                    <summary class="fw-semibold text-primary">View week-by-week plan</summary>
+                                    <div class="mt-3">
+                                        <% phase.weeklyPlan.forEach(week => { %>
+                                            <div class="border-start border-primary border-3 ps-3 mb-3">
+                                                <h6 class="fw-semibold text-dark">Week <%= week.weekNumber %>: <%= week.focus %></h6>
+                                                <ul class="text-muted small ps-3 mb-2">
+                                                    <% week.tasks.forEach(task => { %><li class="mb-1"><%= task %></li><% }) %>
+                                                </ul>
+                                                <p class="small text-muted mb-0"><span class="fw-semibold">Deliverable:</span> <%= week.deliverable %></p>
+                                            </div>
+                                        <% }) %>
+                                    </div>
+                                </details>
+                            <% } %>
+
+                            <% if (phase.resources && phase.resources.length) { %>
+                                <h6 class="fw-semibold text-secondary small text-uppercase">Suggested resources</h6>
+                                <ul class="text-muted small ps-3 mb-0">
+                                    <% phase.resources.forEach(resource => { %><li class="mb-1"><%= resource %></li><% }) %>
+                                </ul>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="card border-0 shadow-sm rounded-4 p-5 text-center">
+                        <i class="ri-route-line display-4 text-primary mb-3"></i>
+                        <h4 class="fw-bold text-dark">Build a clear path to your next role</h4>
+                        <p class="text-muted mb-0">Choose a target role, your current level, and weekly study time. AI will create and save a step-by-step plan for you.</p>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const roadmapForm = document.querySelector('form[action="/roadmap/generate"]');
+        if (roadmapForm) {
+            roadmapForm.addEventListener('submit', () => {
+                const button = roadmapForm.querySelector('button[type="submit"]');
+                button.disabled = true;
+                button.innerHTML = 'Generating roadmap...';
+            });
+        }
+    </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,331 @@
+<%- include('partials/header') %>
+
+    <%- include('partials/sidebar') %>
+
+    <div class="sidebar-page-content">
+        <main class="container py-5 px-4 flex-grow-1">
+            <div class="row mb-4 align-items-center app-page-heading">
+                <div class="col-lg-8">
+                    <h2 class="fw-bold text-dark mb-1">
+                        <i class="ri-bar-chart-box-fill text-primary me-2"></i> Skill Gap Analyzer
+                    </h2>
+                    <p class="text-muted small mb-0">Measure your readiness for target roles and prioritize the highest-impact learning gaps.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <span class="badge bg-success px-3 py-2 rounded-pill fw-semibold">Target: <span id="targetRoleBadge">Full-Stack MERN</span></span>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <h5 class="fw-bold text-dark mb-3">Select target job role</h5>
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-9">
+                        <select id="targetRoleSelect" class="form-select bg-light border-0 shadow-none py-2">
+                            <option value="MERN Stack Developer" selected>MERN Stack Developer</option>
+                            <option value="Frontend Developer (React/Vue)">Frontend Developer (React/Vue)</option>
+                            <option value="Python / Django / Flask Developer">Python / Django / Flask Developer</option>
+                            <option value="Java / Spring Boot Developer">Java / Spring Boot Developer</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button id="analyzeBtn" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold shadow-sm">
+                            <i class="ri-refresh-line me-1"></i> Analyze Gap
+                        </button>
+                    </div>
+                </div>
+                <div class="row g-3 mt-1">
+                    <div class="col-12">
+                        <label for="currentSkillsInput" class="form-label fw-semibold">Your current skills</label>
+                        <textarea id="currentSkillsInput" class="form-control bg-light border-0 shadow-none" rows="2" maxlength="3000" placeholder="For example: JavaScript, React.js, Node.js"></textarea>
+                        <div class="form-text">Separate skills with commas or new lines. These are treated as self-reported, not verified.</div>
+                    </div>
+                    <div class="col-12">
+                        <label for="jobDescriptionInput" class="form-label fw-semibold">Job description <span class="text-muted fw-normal">(optional)</span></label>
+                        <textarea id="jobDescriptionInput" class="form-control bg-light border-0 shadow-none" rows="3" maxlength="12000" placeholder="Paste a job description to prioritize its specific requirements."></textarea>
+                    </div>
+                </div>
+                <div id="analysisMessage" class="alert d-none mt-3 mb-0" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 text-center">
+                        <h6 class="text-muted mb-2">Overall Match Score</h6>
+                        <h1 class="fw-bold text-primary display-4 mb-0" id="matchScore">—</h1>
+                        <p class="text-muted small mt-2 mb-0" id="scoreExplanation">Submit your skills to calculate a role-specific readiness score.</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h6 class="text-muted mb-3">Matched skills</h6>
+                        <div class="d-flex flex-wrap gap-2" id="matchedSkillsContainer"><span class="small text-muted">No analysis yet.</span></div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h6 class="text-muted mb-3">Missing skills</h6>
+                        <div class="d-flex flex-wrap gap-2" id="missingSkillsContainer"><span class="small text-muted">No analysis yet.</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-xl-7">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h5 class="fw-bold text-dark mb-4">Skill match breakdown</h5>
+                        <div class="d-grid gap-3" id="skillBreakdown"><span class="small text-muted">Your evidence-based skill breakdown will appear here.</span></div>
+                    </div>
+                </div>
+
+                <div class="col-xl-5">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-lightbulb-line text-warning me-2"></i> Recommended learning path</h5>
+                        <p class="text-muted small mb-2">Marking a topic complete tracks progress only; it does not verify mastery.</p>
+                        <ul class="text-muted small mb-0 ps-3" style="line-height: 1.9;" id="learningPlan">
+                            <li>Submit your skills to generate a personalized roadmap.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h5 class="fw-bold text-dark mb-3">Skills to improve</h5>
+                        <div id="improvementAreas" class="text-muted small">No analysis yet.</div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h5 class="fw-bold text-dark mb-3">Project recommendations</h5>
+                        <div id="projectRecommendations" class="text-muted small">No analysis yet.</div>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3">Next steps</h5>
+                        <ul id="nextStepsContainer" class="text-muted small mb-0 ps-3"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('partials/footer') %>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const targetRoleSelect = document.getElementById('targetRoleSelect');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const matchScore = document.getElementById('matchScore');
+        const targetRoleBadge = document.getElementById('targetRoleBadge');
+        const matchedSkillsContainer = document.getElementById('matchedSkillsContainer');
+        const missingSkillsContainer = document.getElementById('missingSkillsContainer');
+        const learningPlan = document.getElementById('learningPlan');
+        const skillBreakdown = document.getElementById('skillBreakdown');
+        const analysisMessage = document.getElementById('analysisMessage');
+        let activeAnalysisId = '';
+
+        function createTextElement(tagName, text, className = '') {
+            const element = document.createElement(tagName);
+            element.textContent = text;
+            if (className) element.className = className;
+            return element;
+        }
+
+        function showMessage(message, isError = false) {
+            analysisMessage.textContent = message;
+            analysisMessage.className = `alert ${isError ? 'alert-danger' : 'alert-info'} mt-3 mb-0`;
+        }
+
+        function addSkillBadges(container, skills, isMissing) {
+            container.replaceChildren();
+            if (!skills.length) {
+                container.append(createTextElement('span', 'No skills in this category.', 'small text-muted'));
+                return;
+            }
+            skills.forEach((skill) => {
+                const badge = createTextElement(
+                    'span',
+                    `${skill.name} · ${isMissing ? skill.priority : skill.importance}`,
+                    `badge bg-light ${isMissing ? 'text-danger' : 'text-success'} border px-3 py-2 fw-semibold`
+                );
+                container.append(badge);
+            });
+        }
+
+        function renderAnalysis(analysis) {
+            activeAnalysisId = analysis._id;
+            targetRoleSelect.value = analysis.targetRole;
+            targetRoleBadge.textContent = analysis.targetRole;
+            document.getElementById('currentSkillsInput').value =
+                analysis.currentSkills.map((skill) => skill.name).join(', ');
+            document.getElementById('jobDescriptionInput').value = analysis.jobDescription || '';
+            matchScore.textContent = `${analysis.readinessScore}%`;
+            document.getElementById('scoreExplanation').textContent =
+                `Weighted method: high priority = 3 points, medium = 2, low = 1; documented skills receive full credit, partial evidence half credit, and skills not provided receive none. ${analysis.scoreExplanation} ${analysis.guidanceType === 'general-role' ? 'General role-based guidance; no job description was supplied.' : 'Based on the supplied job description.'} This is not a probability of getting a job.`;
+            addSkillBadges(matchedSkillsContainer, analysis.matchedSkills, false);
+            addSkillBadges(missingSkillsContainer, analysis.missingSkills, true);
+
+            skillBreakdown.replaceChildren();
+            analysis.requiredSkills.forEach((skill) => {
+                const percent = skill.evidenceStatus === 'documented' ? 100 : skill.evidenceStatus === 'partial' ? 50 : 0;
+                const row = document.createElement('div');
+                const heading = document.createElement('div');
+                heading.className = 'd-flex justify-content-between align-items-center mb-1';
+                heading.append(
+                    createTextElement('span', `${skill.name} · ${skill.importance} priority`, 'small fw-semibold text-dark'),
+                    createTextElement('span', `${skill.evidenceStatus.replace('-', ' ')} · ${percent}%`, 'small text-muted')
+                );
+                const progress = document.createElement('div');
+                progress.className = 'progress';
+                progress.style.height = '10px';
+                const bar = document.createElement('div');
+                bar.className = `progress-bar ${percent === 100 ? 'bg-success' : percent === 50 ? 'bg-warning' : 'bg-danger'}`;
+                bar.setAttribute('role', 'progressbar');
+                bar.setAttribute('aria-valuenow', String(percent));
+                bar.setAttribute('aria-valuemin', '0');
+                bar.setAttribute('aria-valuemax', '100');
+                bar.style.width = `${percent}%`;
+                progress.append(bar);
+                const evidence = skill.evidenceStatus === 'not-provided'
+                    ? `Estimated learning time: ${skill.estimatedLearningHours} hours.`
+                    : `Evidence: ${skill.matchedCurrentSkill || 'No specific entered skill identified.'}`;
+                row.append(
+                    heading,
+                    progress,
+                    createTextElement('p', `${skill.reason} ${evidence}`, 'small text-muted mb-0 mt-1')
+                );
+                skillBreakdown.append(row);
+            });
+
+            const completedItems = new Set((analysis.progress?.completedItems || []).map((item) => item.itemId));
+            learningPlan.replaceChildren();
+            analysis.learningRoadmap.forEach((phase, phaseIndex) => {
+                const phaseItem = createTextElement('li', '');
+                phaseItem.append(createTextElement('strong', `Phase ${phase.phase}: ${phase.title} (${phase.durationWeeks} weeks, estimated)`));
+                const topicsList = document.createElement('ul');
+                topicsList.className = 'ps-3';
+                phase.topics.forEach((topic, topicIndex) => {
+                    const itemId = `${phaseIndex}-${topicIndex}`;
+                    const topicItem = document.createElement('li');
+                    const label = document.createElement('label');
+                    label.className = 'form-check-label';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'form-check-input me-2';
+                    checkbox.checked = completedItems.has(itemId);
+                    checkbox.setAttribute('aria-label', `Mark ${topic} learning milestone as complete`);
+                    checkbox.addEventListener('change', () => updateProgress(itemId, checkbox));
+                    label.append(checkbox, document.createTextNode(topic));
+                    topicItem.append(label);
+                    topicsList.append(topicItem);
+                });
+                phaseItem.append(topicsList,
+                    createTextElement('p', `Project: ${phase.project}`, 'mb-1'),
+                    createTextElement('p', `Outcome: ${phase.outcome}`, 'mb-2'));
+                learningPlan.append(phaseItem);
+            });
+
+            const improvementContainer = document.getElementById('improvementAreas');
+            improvementContainer.replaceChildren();
+            if (!analysis.improvementAreas.length) {
+                improvementContainer.textContent = 'No specific improvement areas were identified from the information provided.';
+            } else {
+                analysis.improvementAreas.forEach((area) => {
+                    const item = document.createElement('div');
+                    item.className = 'mb-3';
+                    item.append(createTextElement('strong', area.name),
+                        createTextElement('p', area.reason, 'mb-1'),
+                        createTextElement('p', area.suggestion, 'mb-0'));
+                    improvementContainer.append(item);
+                });
+            }
+
+            const projects = document.getElementById('projectRecommendations');
+            projects.replaceChildren();
+            analysis.projectRecommendations.forEach((project) => {
+                const item = document.createElement('div');
+                item.className = 'mb-3';
+                item.append(createTextElement('strong', `${project.title} · ${project.difficulty}`),
+                    createTextElement('p', project.description, 'mb-1'),
+                    createTextElement('p', `Skills: ${project.skills.join(', ')}. Technologies: ${project.technologies.join(', ')}.`, 'mb-1'),
+                    createTextElement('p', `Outcome: ${project.expectedOutcome}`, 'mb-0'));
+                projects.append(item);
+            });
+
+            const nextSteps = document.getElementById('nextStepsContainer');
+            nextSteps.replaceChildren();
+            analysis.nextSteps.forEach((step) => nextSteps.append(createTextElement('li', step)));
+
+            showMessage(analysis.guidanceType === 'general-role'
+                ? 'Analysis complete. Guidance is based on general role requirements because no job description was provided.'
+                : 'Analysis complete. The supplied job description was used as the primary source of requirements.');
+        }
+
+        async function updateProgress(itemId, checkbox) {
+            checkbox.disabled = true;
+            try {
+                const response = await fetch(`/skills/${encodeURIComponent(activeAnalysisId)}/progress`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ itemId, completed: checkbox.checked })
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Progress could not be saved.');
+            } catch (error) {
+                checkbox.checked = !checkbox.checked;
+                showMessage(error.message || 'Progress could not be saved. Please try again.', true);
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+
+        async function fetchAnalysis(id) {
+            const response = await fetch(`/skills/${encodeURIComponent(id)}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.message || 'The saved analysis could not be loaded.');
+            renderAnalysis(result.analysis);
+        }
+
+        analyzeBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+            const originalButton = analyzeBtn.innerHTML;
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = 'Analyzing...';
+            analysisMessage.className = 'alert alert-info mt-3 mb-0';
+            analysisMessage.textContent = 'Analyzing your skills with Gemini...';
+            fetch('/skills/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    targetRole: targetRoleSelect.value,
+                    currentSkills: document.getElementById('currentSkillsInput').value,
+                    jobDescription: document.getElementById('jobDescriptionInput').value
+                })
+            })
+                .then(async (response) => {
+                    const result = await response.json();
+                    if (!response.ok || !result.success) throw new Error(result.message || 'Analysis failed.');
+                    renderAnalysis(result.analysis);
+                })
+                .catch((error) => showMessage(error.message || 'Analysis failed. Please try again.', true))
+                .finally(() => {
+                    analyzeBtn.disabled = false;
+                    analyzeBtn.innerHTML = originalButton;
+                });
+        });
+
+        const latestAnalysisId = <%- JSON.stringify(latestAnalysisId) %>;
+        if (latestAnalysisId) {
+            fetchAnalysis(latestAnalysisId).catch((error) =>
+                showMessage(error.message || 'The latest saved analysis could not be loaded.', true)
+            );
+        }
+    </script>
+</body>
+</html>

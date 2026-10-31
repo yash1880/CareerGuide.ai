@@ -1,0 +1,613 @@
+<%- include('partials/header') %>
+
+<%- include('partials/sidebar') %>
+
+<div class="sidebar-page-content">
+    <main class="container py-5 px-4 flex-grow-1">
+        <div class="mb-4 app-page-heading">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="ri-question-answer-line text-primary me-2"></i>Mock Interview
+            </h2>
+            <p class="text-muted small mb-0">Choose your language and difficulty, answer 15 multiple-choice questions, then review your score and explanations. JavaScript questions are drawn at random from the quiz bank.</p>
+        </div>
+
+        <div id="pageMessage" class="alert d-none" role="status" aria-live="polite"></div>
+
+        <section id="setupSection" class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+            <h5 class="fw-bold text-dark mb-3">Configure your interview</h5>
+            <form id="setupForm">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-6 col-xl-5">
+                        <label for="languageSelect" class="form-label small fw-semibold text-secondary">Programming language</label>
+                        <select id="languageSelect" class="form-select bg-light border-0 shadow-none" required>
+                            <% supportedLanguages.forEach((language) => { %>
+                                <option value="<%= language %>" <%= language === 'JavaScript' ? 'selected' : '' %>><%= language %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="col-md-6 col-xl-5">
+                        <label for="difficultySelect" class="form-label small fw-semibold text-secondary">Question level</label>
+                        <select id="difficultySelect" class="form-select bg-light border-0 shadow-none" required>
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard" selected>Hard</option>
+                        </select>
+                    </div>
+                    <div class="col-12 d-flex flex-wrap align-items-center gap-3 mt-2">
+                        <button id="startInterviewButton" type="submit" class="btn btn-primary rounded-pill fw-semibold px-4">
+                            <i class="ri-play-line me-1"></i>Start 15-question interview
+                        </button>
+                        <span class="small text-muted"><i class="ri-checkbox-circle-line text-primary me-1"></i>15 MCQs <span class="mx-1">·</span> Instant feedback <span class="mx-1">·</span> Results at the end</span>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section id="interviewSection" class="d-none">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">Interview in progress</h5>
+                        <p id="interviewMetadata" class="small text-muted mb-0"></p>
+                    </div>
+                    <span id="questionCounter" class="badge bg-primary px-3 py-2 rounded-pill">HARD · Question 1 of 15</span>
+                </div>
+                <div class="progress mb-4" style="height: 8px;">
+                    <div id="interviewProgress" class="progress-bar bg-primary" role="progressbar" style="width: 0%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
+                </div>
+
+                <div id="questionPanel" class="rounded-3 bg-light p-3 p-md-4 mb-3">
+                    <div class="small text-primary fw-semibold mb-2" id="questionTopic"></div>
+                    <h5 class="fw-semibold text-dark mb-0" id="questionText"></h5>
+                </div>
+
+                <form id="answerForm">
+                    <fieldset id="answerOptions" class="border-0 p-0 m-0 mb-3">
+                        <legend class="form-label fw-semibold small text-secondary">Choose one answer</legend>
+                    </fieldset>
+                    <div id="answerTextPanel" class="mb-3 d-none">
+                        <label for="answerText" class="form-label fw-semibold small text-secondary">Your response</label>
+                        <textarea id="answerText" class="form-control bg-light border-0" rows="6" maxlength="10000" placeholder="Explain your reasoning as you would in an interview..." aria-describedby="answerTextHelp"></textarea>
+                        <div id="answerTextHelp" class="form-text">Write your own answer first. You can review the reference answer after submitting.</div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button id="submitAnswerButton" type="submit" class="btn btn-primary rounded-pill fw-semibold px-4">
+                            Next question<i class="ri-arrow-right-line ms-1"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <section id="selfRatingPanel" class="border rounded-3 p-3 mt-3 d-none" aria-labelledby="selfRatingHeading">
+                    <h6 id="selfRatingHeading" class="fw-bold text-dark">Reflect on your response</h6>
+                    <p class="small text-muted">Compare your response with the reference, then rate how completely you covered the key points. This is a self-assessment, not an automated grade.</p>
+                    <p class="small text-muted"><strong>Rubric:</strong> 0–3 = missing or mostly incorrect; 4–6 = partly correct, with important gaps; 7–8 = mostly complete; 9–10 = accurate, complete, and clearly explained.</p>
+                    <div id="selfRatingComparison" class="row g-3 mb-3"></div>
+                    <div class="d-flex flex-wrap align-items-end gap-3">
+                        <div>
+                            <label for="selfRatingScore" class="form-label small fw-semibold text-secondary">Your self-rating (0–10)</label>
+                            <select id="selfRatingScore" class="form-select" required>
+                                <% for (let score = 0; score <= 10; score += 1) { %>
+                                    <option value="<%= score %>" <%= score === 5 ? 'selected' : '' %>><%= score %> / 10</option>
+                                <% } %>
+                            </select>
+                        </div>
+                        <button id="rateAnswerButton" type="button" class="btn btn-success rounded-pill fw-semibold px-4">Save rating &amp; continue</button>
+                    </div>
+                </section>
+
+                <div class="d-flex flex-wrap gap-2 mt-3">
+                    <button id="nextQuestionButton" type="button" class="btn btn-outline-primary rounded-pill fw-semibold px-4 d-none">
+                        Next question<i class="ri-arrow-right-line ms-1"></i>
+                    </button>
+                    <button id="completeInterviewButton" type="button" class="btn btn-success rounded-pill fw-semibold px-4 d-none">
+                    Submit interview<i class="ri-send-plane-line ms-1"></i>
+                    </button>
+                </div>
+
+                <div id="answerFeedback" class="border rounded-3 p-3 mt-4 d-none" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section id="reportSection" class="d-none">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-1">Interview report</h4>
+                        <p id="reportMetadata" class="small text-muted mb-0"></p>
+                    </div>
+                    <div class="text-md-end">
+                        <div id="reportTotalScore" class="display-6 fw-bold text-primary"></div>
+                        <div id="reportPercentage" class="small text-muted"></div>
+                    </div>
+                </div>
+                <p id="reportSummary" class="text-muted mb-4"></p>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Strongest topics</h6>
+                        <ul id="strongestTopics" class="small text-muted ps-3"></ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-warning">Topics to strengthen</h6>
+                        <ul id="weakestTopics" class="small text-muted ps-3"></ul>
+                    </div>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Technical knowledge</h6>
+                        <p id="technicalAssessment" class="small text-muted"></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Coding and debugging</h6>
+                        <p id="codingAssessment" class="small text-muted"></p>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Recommended revision</h6>
+                        <ul id="topicsToRevise" class="small text-muted ps-3"></ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Improvement plan</h6>
+                        <ul id="improvementPlan" class="small text-muted ps-3"></ul>
+                    </div>
+                </div>
+            </div>
+            <h5 class="fw-bold text-dark mb-3">Question-by-question feedback</h5>
+            <div id="questionResults" class="d-grid gap-3 mb-4"></div>
+            <button id="newInterviewButton" type="button" class="btn btn-primary rounded-pill fw-semibold px-4 mb-4">
+                <i class="ri-refresh-line me-1"></i>Start another interview
+            </button>
+        </section>
+
+        <section class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1">Your interview history</h5>
+                    <p class="small text-muted mb-0">Resume an unfinished interview or review a completed report.</p>
+                </div>
+                <button id="refreshHistoryButton" type="button" class="btn btn-sm btn-outline-secondary rounded-pill">
+                    <i class="ri-refresh-line me-1"></i>Refresh
+                </button>
+            </div>
+            <div id="interviewHistory" class="d-grid gap-2">
+                <span class="small text-muted">Loading your interview history...</span>
+            </div>
+        </section>
+    </main>
+
+    <%- include('partials/footer') %>
+</div>
+
+<script>
+    (() => {
+        const apiBase = '/ai/mock-interview';
+        const setupSection = document.getElementById('setupSection');
+        const interviewSection = document.getElementById('interviewSection');
+        const reportSection = document.getElementById('reportSection');
+        const pageMessage = document.getElementById('pageMessage');
+        const languageSelect = document.getElementById('languageSelect');
+        const answerForm = document.getElementById('answerForm');
+        let activeSession = null;
+        let waitingForNextQuestion = false;
+
+        function textElement(tag, text, className = '') {
+            const element = document.createElement(tag);
+            element.textContent = text;
+            if (className) element.className = className;
+            return element;
+        }
+
+        function showMessage(message, isError = false) {
+            pageMessage.textContent = message;
+            pageMessage.className = `alert ${isError ? 'alert-danger' : 'alert-info'}`;
+        }
+
+        function clearMessage() {
+            pageMessage.textContent = '';
+            pageMessage.className = 'alert d-none';
+        }
+
+        async function request(url, options = {}) {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', ...(options.body ? { 'Content-Type': 'application/json' } : {}) },
+                ...options
+            });
+            let result;
+            try {
+                result = await response.json();
+            } catch {
+                throw new Error('The server returned an unreadable response.');
+            }
+            if (!response.ok || !result.success) {
+                throw new Error(result.message || 'The request could not be completed.');
+            }
+            return result;
+        }
+
+        function fillList(containerId, items) {
+            const list = document.getElementById(containerId);
+            list.replaceChildren();
+            items.forEach((item) => list.append(textElement('li', item)));
+        }
+
+        function renderFeedback(evaluation, questionNumber) {
+            const box = document.getElementById('answerFeedback');
+            box.replaceChildren();
+            box.className = 'border rounded-3 p-3 mt-4';
+            const title = evaluation.selfAssessed
+                ? `Question ${questionNumber}: Self-rating ${evaluation.score}/10`
+                : `Question ${questionNumber}: ${evaluation.correct ? 'Correct' : 'Incorrect'} · ${evaluation.score}/10`;
+            box.append(
+                textElement('h6', title, `fw-bold ${evaluation.selfAssessed ? 'text-primary' : evaluation.correct ? 'text-success' : 'text-danger'} mb-2`),
+                textElement('p', `Your answer: ${evaluation.answer}`, 'small text-muted mb-2'),
+                textElement('strong', 'Reference answer', 'small fw-semibold text-primary d-block'),
+                textElement('p', evaluation.referenceAnswer, 'small text-muted mt-1 mb-0')
+            );
+        }
+
+        function renderQuestion(session) {
+            const question = session.currentQuestionData;
+            if (!question) return;
+            document.getElementById('questionCounter').textContent =
+                `${session.difficulty.toUpperCase()} · Question ${question.questionNumber} of 15`;
+            const percent = Math.round(((session.answeredCount ?? session.completedCount) / 15) * 100);
+            const progress = document.getElementById('interviewProgress');
+            progress.style.width = `${percent}%`;
+            progress.setAttribute('aria-valuenow', String(percent));
+            document.getElementById('questionTopic').textContent = `${question.topic} · ${question.kind}`;
+            document.getElementById('questionText').textContent = question.question;
+            const options = document.getElementById('answerOptions');
+            const isMultipleChoice = session.responseMode === 'multiple-choice';
+            options.classList.toggle('d-none', !isMultipleChoice);
+            document.getElementById('answerTextPanel').classList.toggle('d-none', isMultipleChoice);
+            document.getElementById('selfRatingPanel').classList.add('d-none');
+            document.getElementById('answerText').required = !isMultipleChoice;
+            document.getElementById('submitAnswerButton').innerHTML = isMultipleChoice
+                ? question.questionNumber === 15
+                    ? 'Submit interview<i class="ri-send-plane-line ms-1"></i>'
+                    : 'Next question<i class="ri-arrow-right-line ms-1"></i>'
+                : '<i class="ri-send-plane-line me-1"></i>Review my response';
+            options.replaceChildren(textElement('legend', 'Choose one answer', 'form-label fw-semibold small text-secondary'));
+            (question.options || []).forEach((option, index) => {
+                const label = document.createElement('label');
+                label.className = 'form-check border rounded-3 p-3 ps-5 mb-2 bg-white';
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = 'answerOption';
+                input.value = String(index);
+                input.className = 'form-check-input';
+                input.required = true;
+                label.append(input, textElement('span', option, 'form-check-label'));
+                options.append(label);
+            });
+            answerForm.reset();
+            document.getElementById('answerFeedback').className = 'border rounded-3 p-3 mt-4 d-none';
+            document.getElementById('questionPanel').classList.remove('d-none');
+            answerForm.classList.remove('d-none');
+            document.getElementById('submitAnswerButton').classList.remove('d-none');
+            document.getElementById('nextQuestionButton').classList.add('d-none');
+            document.getElementById('completeInterviewButton').classList.add('d-none');
+        }
+
+        function renderSelfRating(session) {
+            const question = session.currentQuestionData;
+            if (!question) return;
+            document.getElementById('questionCounter').textContent =
+                `${session.difficulty.toUpperCase()} · Question ${question.questionNumber} of 15 · review`;
+            document.getElementById('questionTopic').textContent = `${question.topic} · ${question.kind}`;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionPanel').classList.remove('d-none');
+            document.getElementById('answerOptions').classList.add('d-none');
+            document.getElementById('answerTextPanel').classList.add('d-none');
+            answerForm.classList.add('d-none');
+            document.getElementById('selfRatingPanel').classList.remove('d-none');
+            document.getElementById('selfRatingScore').value = '5';
+            document.getElementById('nextQuestionButton').classList.add('d-none');
+            document.getElementById('completeInterviewButton').classList.add('d-none');
+
+            const comparison = document.getElementById('selfRatingComparison');
+            comparison.replaceChildren();
+            const answerColumn = document.createElement('div');
+            answerColumn.className = 'col-md-6';
+            answerColumn.append(
+                textElement('div', 'Your response', 'small fw-semibold text-secondary mb-1'),
+                textElement('p', question.answer, 'small text-dark mb-0 text-break')
+            );
+            const referenceColumn = document.createElement('div');
+            referenceColumn.className = 'col-md-6';
+            referenceColumn.append(
+                textElement('div', 'Reference answer', 'small fw-semibold text-primary mb-1'),
+                textElement('p', question.referenceAnswer, 'small text-muted mb-0')
+            );
+            comparison.append(answerColumn, referenceColumn);
+            const box = document.getElementById('answerFeedback');
+            box.replaceChildren();
+            box.className = 'border rounded-3 p-3 mt-4 d-none';
+        }
+
+        function renderSession(session, options = {}) {
+            clearMessage();
+            activeSession = session;
+            waitingForNextQuestion = Boolean(options.waitingForNextQuestion);
+            setupSection.classList.add('d-none');
+            reportSection.classList.add('d-none');
+            interviewSection.classList.remove('d-none');
+            document.getElementById('interviewMetadata').textContent =
+                `${session.language} · ${session.difficulty} · ${session.responseMode === 'multiple-choice' ? 'Multiple-choice practice' : 'Open-ended practice'}`;
+            const progress = document.getElementById('interviewProgress');
+            const percent = Math.round(((session.answeredCount ?? session.completedCount) / 15) * 100);
+            progress.style.width = `${percent}%`;
+            progress.setAttribute('aria-valuenow', String(percent));
+
+            if (session.lastEvaluation) {
+                renderFeedback(session.lastEvaluation, session.lastEvaluation.questionNumber);
+            } else {
+                document.getElementById('answerFeedback').className = 'border rounded-3 p-3 mt-4 d-none';
+            }
+
+            if (session.status === 'completed' && session.finalReport) {
+                renderReport(session);
+                return;
+            }
+
+            if (session.awaitingScore) {
+                renderSelfRating(session);
+                return;
+            }
+
+            document.getElementById('selfRatingPanel').classList.add('d-none');
+            if (session.currentQuestionData && !waitingForNextQuestion) {
+                renderQuestion(session);
+            } else if (waitingForNextQuestion && session.lastEvaluation) {
+                document.getElementById('questionPanel').classList.add('d-none');
+                answerForm.classList.add('d-none');
+                renderFeedback(session.lastEvaluation, session.lastEvaluation.questionNumber);
+                document.getElementById('nextQuestionButton').classList.remove('d-none');
+            } else {
+                document.getElementById('questionPanel').classList.add('d-none');
+                answerForm.classList.add('d-none');
+                if (session.status === 'report-pending') {
+                    document.getElementById('questionCounter').textContent =
+                        `${session.difficulty.toUpperCase()} · ${session.responseMode === 'multiple-choice' ? 'All 15 answers saved' : 'All 15 questions answered'}`;
+                    if (session.lastEvaluation) {
+                        renderFeedback(session.lastEvaluation, session.lastEvaluation.questionNumber);
+                    }
+                    document.getElementById('completeInterviewButton').classList.remove('d-none');
+                    document.getElementById('nextQuestionButton').classList.add('d-none');
+                }
+            }
+        }
+
+        function renderReport(session) {
+            const report = session.finalReport;
+            if (!report) return;
+            activeSession = session;
+            setupSection.classList.add('d-none');
+            interviewSection.classList.add('d-none');
+            reportSection.classList.remove('d-none');
+            document.getElementById('reportMetadata').textContent =
+                `${session.language} · ${session.difficulty} · ${session.responseMode === 'multiple-choice' ? 'Multiple-choice practice' : 'Open-ended, self-assessed practice'}`;
+            document.getElementById('reportTotalScore').textContent = `${report.totalScore}/150`;
+            document.getElementById('reportPercentage').textContent = `${report.percentage}% · ${session.responseMode === 'multiple-choice' ? 'calculated from correct answers' : 'based on your self-ratings'}`;
+            document.getElementById('reportSummary').textContent = report.performanceSummary;
+            document.getElementById('technicalAssessment').textContent = report.technicalKnowledgeAssessment;
+            document.getElementById('codingAssessment').textContent = report.codingDebuggingAssessment;
+            fillList('strongestTopics', report.strongestTopics);
+            fillList('weakestTopics', report.weakestTopics);
+            fillList('topicsToRevise', report.topicsToRevise);
+            fillList('improvementPlan', report.improvementPlan);
+
+            const resultsContainer = document.getElementById('questionResults');
+            resultsContainer.replaceChildren();
+            report.questionResults.forEach((result) => {
+                const card = document.createElement('article');
+                card.className = 'card border-0 shadow-sm rounded-4 p-3 bg-white';
+                card.append(
+                    textElement('div', `Question ${result.questionNumber} · ${result.topic} · ${result.selfAssessed ? 'Self-rating' : result.score === 10 ? 'Correct' : 'Incorrect'} · ${result.score}/10`, `fw-bold ${result.selfAssessed ? 'text-primary' : result.score === 10 ? 'text-success' : 'text-danger'} mb-2`),
+                    textElement('p', result.question, 'text-dark mb-2'),
+                    textElement('div', result.selfAssessed ? 'Your response' : 'Your selected answer', 'small fw-semibold text-secondary'),
+                    textElement('p', result.answer, 'small text-muted mb-2'),
+                    textElement('div', 'Reference answer', 'small fw-semibold text-primary'),
+                    textElement('p', result.modelAnswer, 'small text-muted mb-2')
+                );
+                if (result.explanation) card.append(textElement('p', result.explanation, 'small text-muted mb-0'));
+                resultsContainer.append(card);
+            });
+        }
+
+        async function loadHistory() {
+            const container = document.getElementById('interviewHistory');
+            container.replaceChildren(textElement('span', 'Loading your interview history...', 'small text-muted'));
+            try {
+                const result = await request(`${apiBase}/history`);
+                container.replaceChildren();
+                if (!result.history.length) {
+                    container.append(textElement('span', 'No interviews yet. Start your first practice interview above.', 'small text-muted'));
+                    return;
+                }
+                result.history.forEach((item) => {
+                    const row = document.createElement('div');
+                    row.className = 'd-flex flex-wrap justify-content-between align-items-center gap-2 border rounded-3 p-3';
+                    const details = document.createElement('div');
+                    const score = item.status === 'completed'
+                        ? ` · ${item.totalScore}/150 (${item.percentage}%)`
+                        : ` · ${item.completedCount}/15 ${item.responseMode === 'multiple-choice' ? 'answers saved' : 'responses assessed'}`;
+                    details.append(
+                        textElement('div', `${item.language} · ${item.difficulty}`, 'fw-semibold text-dark'),
+                        textElement('div', `${new Date(item.createdAt).toLocaleString()} · ${item.status.replace('-', ' ')}${score}`, 'small text-muted')
+                    );
+                    const openButton = document.createElement('button');
+                    openButton.type = 'button';
+                    openButton.className = 'btn btn-sm btn-outline-primary rounded-pill';
+                    openButton.textContent = item.status === 'completed' ? 'View report' : 'Resume';
+                    openButton.addEventListener('click', () => openInterview(item.id));
+                    row.append(details, openButton);
+                    container.append(row);
+                });
+            } catch (error) {
+                container.replaceChildren(textElement('span', error.message, 'small text-danger'));
+            }
+        }
+
+        async function openInterview(id) {
+            try {
+                const result = await request(`${apiBase}/${encodeURIComponent(id)}`);
+                if (result.session.status === 'completed') {
+                    renderReport(result.session);
+                    clearMessage();
+                } else {
+                    renderSession(result.session);
+                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showMessage(error.message, true);
+            }
+        }
+
+        async function completeInterview() {
+            if (!activeSession) return;
+            const button = document.getElementById('completeInterviewButton');
+            button.disabled = true;
+            button.textContent = 'Submitting interview...';
+            try {
+                const result = await request(`${apiBase}/${encodeURIComponent(activeSession.id)}/complete`, {
+                    method: 'POST',
+                    body: JSON.stringify({})
+                });
+                renderReport(result.session);
+                clearMessage();
+                await loadHistory();
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                button.disabled = false;
+                button.innerHTML = 'Submit interview<i class="ri-send-plane-line ms-1"></i>';
+            }
+        }
+
+        document.getElementById('setupForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const button = document.getElementById('startInterviewButton');
+            const language = languageSelect.value;
+            button.disabled = true;
+            button.textContent = 'Starting interview...';
+            showMessage('Preparing your 15-question multiple-choice interview...', false);
+            try {
+                const result = await request(`${apiBase}/start`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        language,
+                        difficulty: document.getElementById('difficultySelect').value
+                    })
+                });
+                renderSession(result.session);
+                await loadHistory();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="ri-play-line me-1"></i>Start 15-question interview';
+            }
+        });
+
+        answerForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!activeSession?.currentQuestionData) return;
+            const button = document.getElementById('submitAnswerButton');
+            const isMultipleChoice = activeSession.responseMode === 'multiple-choice';
+            const isFinalQuestion = isMultipleChoice && activeSession.currentQuestionData.questionNumber === 15;
+            const selected = isMultipleChoice
+                ? answerForm.querySelector('input[name="answerOption"]:checked')
+                : document.getElementById('answerText').value.trim();
+            if (!selected) {
+                showMessage(isMultipleChoice ? 'Select one answer before submitting.' : 'Write your response before continuing.', true);
+                return;
+            }
+            button.disabled = true;
+            button.textContent = isMultipleChoice ? 'Checking answer...' : 'Saving response...';
+            try {
+                const result = await request(`${apiBase}/${encodeURIComponent(activeSession.id)}/answer`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        questionNumber: activeSession.currentQuestionData.questionNumber,
+                        answer: isMultipleChoice ? Number(selected.value) : selected
+                    })
+                });
+                if (isFinalQuestion) {
+                    activeSession = result.session;
+                    renderSession(result.session);
+                    const reportResult = await request(`${apiBase}/${encodeURIComponent(activeSession.id)}/complete`, {
+                        method: 'POST',
+                        body: JSON.stringify({})
+                    });
+                    renderReport(reportResult.session);
+                } else {
+                    renderSession(result.session, { waitingForNextQuestion: !isMultipleChoice });
+                }
+                clearMessage();
+                await loadHistory();
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                button.disabled = false;
+                const questionNumber = activeSession?.currentQuestionData?.questionNumber;
+                button.innerHTML = activeSession?.responseMode === 'multiple-choice'
+                    ? questionNumber === 15
+                        ? 'Submit interview<i class="ri-send-plane-line ms-1"></i>'
+                        : 'Next question<i class="ri-arrow-right-line ms-1"></i>'
+                    : '<i class="ri-send-plane-line me-1"></i>Review my response';
+            }
+        });
+
+        document.getElementById('rateAnswerButton').addEventListener('click', async (event) => {
+            if (!activeSession?.currentQuestionData || !activeSession.awaitingScore) return;
+            const button = event.currentTarget;
+            button.disabled = true;
+            button.textContent = 'Saving rating...';
+            try {
+                const result = await request(`${apiBase}/${encodeURIComponent(activeSession.id)}/rate`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        questionNumber: activeSession.currentQuestionData.questionNumber,
+                        score: Number(document.getElementById('selfRatingScore').value)
+                    })
+                });
+                renderSession(result.session, { waitingForNextQuestion: true });
+                clearMessage();
+                await loadHistory();
+            } catch (error) {
+                showMessage(error.message, true);
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Save rating & continue';
+            }
+        });
+
+        document.getElementById('nextQuestionButton').addEventListener('click', () => {
+            if (!activeSession?.currentQuestionData) return;
+            waitingForNextQuestion = false;
+            renderQuestion(activeSession);
+            answerForm.querySelector('input[name="answerOption"]')?.focus();
+        });
+
+        document.getElementById('completeInterviewButton').addEventListener('click', completeInterview);
+        document.getElementById('refreshHistoryButton').addEventListener('click', loadHistory);
+        document.getElementById('newInterviewButton').addEventListener('click', () => {
+            activeSession = null;
+            reportSection.classList.add('d-none');
+            interviewSection.classList.add('d-none');
+            setupSection.classList.remove('d-none');
+            clearMessage();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        loadHistory();
+        const sessionId = new URLSearchParams(window.location.search).get('session');
+        if (sessionId) {
+            window.history.replaceState(null, '', window.location.pathname);
+            openInterview(sessionId);
+        }
+    })();
+</script>

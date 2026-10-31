@@ -1,0 +1,96 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<div class="sidebar-page-content">
+    <main class="container-fluid py-5 px-4" style="max-width: 1100px;">
+        <div class="mb-4 app-page-heading">
+            <h2 class="fw-bold text-dark mb-1"><i class="ri-robot-2-line text-primary me-2"></i>AI Career Counselor</h2>
+            <p class="text-muted mb-0">Ask for practical guidance on career paths, skills, resumes or interview preparation.</p>
+        </div>
+        <section class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div id="conversation" class="p-4" aria-live="polite" style="min-height: 320px; max-height: 60vh; overflow-y: auto;">
+                <div class="d-flex gap-3 mb-3">
+                    <div class="bg-primary-subtle text-primary rounded-circle p-2 flex-shrink-0"><i class="ri-sparkling-2-line"></i></div>
+                    <div class="bg-light rounded-4 p-3 text-dark">Tell me what career decision or challenge you would like help with. Avoid sharing passwords or other sensitive personal information.</div>
+                </div>
+            </div>
+            <div class="border-top p-3 p-md-4">
+                <div id="counselorMessage" class="alert d-none mb-3" role="alert"></div>
+                <form id="counselorForm">
+                    <label for="counselorPrompt" class="form-label small fw-semibold">Your question</label>
+                    <textarea id="counselorPrompt" class="form-control bg-light border-0 rounded-4 p-3" rows="3" maxlength="1500" required placeholder="For example: What should I learn to prepare for a junior frontend developer role?"></textarea>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="text-muted small">Do not include confidential or sensitive information.</span>
+                        <button id="counselorSubmit" class="btn btn-primary rounded-pill px-4" type="submit">
+                            <i class="ri-send-plane-line me-1"></i> Get guidance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const counselorForm = document.getElementById('counselorForm');
+    const counselorPrompt = document.getElementById('counselorPrompt');
+    const counselorSubmit = document.getElementById('counselorSubmit');
+    const counselorMessage = document.getElementById('counselorMessage');
+    const conversation = document.getElementById('conversation');
+
+    function addMessage(text, isUser) {
+        const row = document.createElement('div');
+        row.className = `d-flex gap-3 mb-3 ${isUser ? 'justify-content-end' : ''}`;
+        const bubble = document.createElement('div');
+        bubble.className = `rounded-4 p-3 ${isUser ? 'bg-primary text-white' : 'bg-light text-dark'}`;
+        bubble.style.whiteSpace = 'pre-wrap';
+        bubble.textContent = text;
+        row.append(bubble);
+        conversation.append(row);
+        conversation.scrollTop = conversation.scrollHeight;
+    }
+
+    counselorForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const prompt = counselorPrompt.value.trim();
+        if (!prompt) return;
+        addMessage(prompt, true);
+        counselorSubmit.disabled = true;
+        counselorSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Thinking...';
+        counselorMessage.classList.add('d-none');
+        try {
+            const response = await fetch('/ai/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            if (response.redirected) {
+                window.location.assign(response.url);
+                return;
+            }
+            let result;
+            try {
+                result = await response.json();
+            } catch {
+                throw new Error('The server returned an unreadable response. Please try again.');
+            }
+            if (!response.ok || !result.success) {
+                counselorMessage.textContent = result.message || 'Unable to get guidance. Please try again.';
+                counselorMessage.className = `alert ${response.status >= 500 ? 'alert-danger' : 'alert-warning'} mb-3`;
+                counselorPrompt.focus();
+                return;
+            }
+            counselorPrompt.value = '';
+            addMessage(result.response, false);
+        } catch (error) {
+            counselorMessage.textContent = error.message || 'Could not reach the server. Please try again.';
+            counselorMessage.className = 'alert alert-danger mb-3';
+            counselorPrompt.focus();
+        } finally {
+            counselorSubmit.disabled = false;
+            counselorSubmit.innerHTML = '<i class="ri-send-plane-line me-1"></i> Get guidance';
+        }
+    });
+</script>
+</body>
+</html>

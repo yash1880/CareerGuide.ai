@@ -1,0 +1,420 @@
+<%- include('partials/header') %>
+
+<%- include('partials/sidebar') %>
+
+<div class="sidebar-page-content">
+    <main class="container py-5 px-4 flex-grow-1">
+        <div class="mb-4 app-page-heading">
+            <h2 class="fw-bold text-dark mb-1">
+                <i class="ri-line-chart-line text-primary me-2"></i>Interview Improvement Tracker
+            </h2>
+            <p class="text-muted small mb-0">Review completed mock interviews and compare your actual results over time.</p>
+        </div>
+
+        <% if (typeof attempt !== 'undefined' && attempt) { %>
+            <a href="/ai/mock-interview/tracker" class="btn btn-sm btn-outline-secondary rounded-pill mb-3">
+                <i class="ri-arrow-left-line me-1"></i>Back to tracker
+            </a>
+            <section class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-1">Interview report</h4>
+                        <p class="small text-muted mb-0"><%= attempt.language %> · <%= attempt.difficulty %> · <%= attempt.responseMode === 'open-ended' ? 'Open-ended self-assessment' : 'Multiple-choice assessment' %> · <%= new Date(attempt.completedAt).toLocaleString() %></p>
+                    </div>
+                    <div class="text-md-end">
+                        <div class="display-6 fw-bold text-primary"><%= attempt.percentage === null ? 'Score unavailable' : `${attempt.percentage}%` %></div>
+                        <div class="small text-muted"><%= attempt.totalScore === null ? 'Total points unavailable' : `${attempt.totalScore}/150 points` %></div>
+                    </div>
+                </div>
+                <% if (attempt.performanceSummary) { %>
+                    <p class="text-muted mb-4"><%= attempt.performanceSummary %></p>
+                <% } %>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-success">Strongest topics</h6>
+                        <% if (attempt.strongestTopics.length) { %>
+                            <ul class="small text-muted ps-3"><% attempt.strongestTopics.forEach((topic) => { %><li><%= topic %></li><% }) %></ul>
+                        <% } else { %><p class="small text-muted">No strongest-topic data was stored.</p><% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-warning">Topics to strengthen</h6>
+                        <% if (attempt.weakestTopics.length) { %>
+                            <ul class="small text-muted ps-3"><% attempt.weakestTopics.forEach((topic) => { %><li><%= topic %></li><% }) %></ul>
+                        <% } else { %><p class="small text-muted">No weakest-topic data was stored.</p><% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Technical knowledge feedback</h6>
+                        <p class="small text-muted"><%= attempt.technicalKnowledgeAssessment || 'No technical knowledge feedback was stored.' %></p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Coding and debugging feedback</h6>
+                        <p class="small text-muted"><%= attempt.codingDebuggingAssessment || 'No coding and debugging feedback was stored.' %></p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Recommended revision</h6>
+                        <% if (attempt.topicsToRevise.length) { %>
+                            <ul class="small text-muted ps-3"><% attempt.topicsToRevise.forEach((topic) => { %><li><%= topic %></li><% }) %></ul>
+                        <% } else { %><p class="small text-muted">No revision topics were stored for this attempt.</p><% } %>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="fw-bold text-dark">Improvement plan</h6>
+                        <% if (attempt.improvementPlan.length) { %>
+                            <ul class="small text-muted ps-3"><% attempt.improvementPlan.forEach((item) => { %><li><%= item %></li><% }) %></ul>
+                        <% } else { %><p class="small text-muted">No improvement recommendations were stored for this attempt.</p><% } %>
+                    </div>
+                </div>
+            </section>
+
+            <% if (attempt.questionResults.length) { %>
+                <h5 class="fw-bold text-dark mb-3">Question-by-question feedback</h5>
+                <div class="d-grid gap-3 mb-4">
+                    <% attempt.questionResults.forEach((result) => { %>
+                        <article class="card border-0 shadow-sm rounded-4 p-3 bg-white">
+                            <div class="fw-bold <%= result.selfAssessed ? result.score >= 7 ? 'text-success' : result.score >= 4 ? 'text-warning' : 'text-danger' : result.score > 0 ? 'text-success' : 'text-danger' %> mb-2">
+                                Question <%= result.questionNumber %> · <%= result.topic %> · <%= result.selfAssessed ? 'Self-rating' : 'Score' %> <%= result.score %>/10
+                            </div>
+                            <p class="text-dark mb-2"><%= result.question %></p>
+                            <div class="small fw-semibold text-secondary">Your answer</div>
+                            <p class="small text-muted mb-2"><%= result.answer || 'No answer was stored.' %></p>
+                            <div class="small fw-semibold text-primary">Reference answer</div>
+                            <p class="small text-muted mb-2"><%= result.modelAnswer || 'No reference answer was stored.' %></p>
+                            <% if (result.explanation) { %><p class="small text-muted mb-2"><%= result.explanation %></p><% } %>
+                            <% if (result.missingOrIncorrectPoints?.length) { %>
+                                <div class="small fw-semibold text-warning">Points to review</div>
+                                <ul class="small text-muted ps-3"><% result.missingOrIncorrectPoints.forEach((point) => { %><li><%= point %></li><% }) %></ul>
+                            <% } %>
+                            <% if (result.suggestions?.length) { %>
+                                <div class="small fw-semibold text-primary">Suggestions</div>
+                                <ul class="small text-muted ps-3 mb-0"><% result.suggestions.forEach((suggestion) => { %><li><%= suggestion %></li><% }) %></ul>
+                            <% } %>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } %>
+        <% } else { %>
+            <section class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">Performance snapshot</h5>
+                        <p class="small text-muted mb-0">Based on your answers from up to 20 recent completed multiple-choice interviews.</p>
+                    </div>
+                    <span class="badge rounded-pill text-bg-primary px-3 py-2"><i class="ri-bar-chart-box-line me-1"></i><%= analyticsAttemptCount %> scored</span>
+                </div>
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-lg-3">
+                        <div class="rounded-4 p-3 h-100" style="background: #f1f5ff;">
+                            <div class="small text-muted mb-1">Average score</div>
+                            <div class="h3 fw-bold text-primary mb-0"><%= averageScore === null ? '—' : `${averageScore}%` %></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="rounded-4 p-3 h-100" style="background: #effaf5;">
+                            <div class="small text-muted mb-1">Personal best</div>
+                            <div class="h3 fw-bold text-success mb-0"><%= bestScore === null ? '—' : `${bestScore}%` %></div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="rounded-4 p-3 h-100" style="background: #fff8eb;">
+                            <div class="small text-muted mb-1">Change since last attempt</div>
+                            <div class="h3 fw-bold <%= scoreTrend === null ? 'text-secondary' : scoreTrend > 0 ? 'text-success' : scoreTrend < 0 ? 'text-danger' : 'text-secondary' %> mb-0">
+                                <%= scoreTrend === null ? '—' : `${scoreTrend > 0 ? '+' : ''}${scoreTrend} pp` %>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg-3">
+                        <div class="rounded-4 p-3 h-100" style="background: #f5f1ff;">
+                            <div class="small text-muted mb-1">Interviews in progress</div>
+                            <div class="h3 fw-bold mb-0" style="color: #6f42c1;"><%= activeAttemptCount %></div>
+                        </div>
+                    </div>
+                </div>
+
+                <% if (chartPoints.length >= 2) { %>
+                    <div class="border rounded-4 p-3 p-md-4 mb-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Score trend</h6>
+                                <p class="small text-muted mb-0">Each point is a recorded score for a completed multiple-choice interview, ordered oldest to newest.</p>
+                            </div>
+                            <span class="small text-muted">Last <%= chartPoints.length %> scored attempts</span>
+                        </div>
+                        <div class="w-100" role="img" aria-label="Line graph showing interview scores over time">
+                            <svg viewBox="0 0 800 280" class="w-100" style="min-height: 180px; max-height: 340px;" aria-hidden="true">
+                                <defs>
+                                    <linearGradient id="scoreArea" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#0d6efd" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="#0d6efd" stop-opacity="0.01" />
+                                    </linearGradient>
+                                </defs>
+                                <% [0, 25, 50, 75, 100].forEach((tick) => { const y = 224 - (tick / 100) * 200; %>
+                                    <line x1="64" y1="<%= y %>" x2="764" y2="<%= y %>" stroke="#e9edf3" stroke-dasharray="<%= tick === 0 ? '0' : '4 6' %>" />
+                                    <text x="54" y="<%= y + 4 %>" text-anchor="end" font-size="12" fill="#7a8494"><%= tick %>%</text>
+                                <% }) %>
+                                <polygon points="64,224 <%= chartPoints.map(({ x, y }) => `${x},${y}`).join(' ') %> 764,224" fill="url(#scoreArea)" />
+                                <polyline points="<%= chartPoints.map(({ x, y }) => `${x},${y}`).join(' ') %>" fill="none" stroke="#0d6efd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                                <% chartPoints.forEach(({ x, y, label, date }, index) => { %>
+                                    <circle cx="<%= x %>" cy="<%= y %>" r="6" fill="#fff" stroke="#0d6efd" stroke-width="3">
+                                        <title>Attempt <%= index + 1 %>: <%= label %> on <%= date %></title>
+                                    </circle>
+                                    <% if (index === 0 || index === chartPoints.length - 1 || index === Math.floor(chartPoints.length / 2)) { %>
+                                        <text x="<%= x %>" y="252" text-anchor="middle" font-size="11" fill="#7a8494"><%= date %></text>
+                                    <% } %>
+                                <% }) %>
+                            </svg>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <div class="rounded-4 p-3 mb-4" style="background: #f6f8fb;">
+                        <div class="fw-semibold text-dark mb-1"><%= chartPoints.length === 1 ? 'Your first score is recorded' : 'Your score trend will appear here' %></div>
+                        <p class="small text-muted mb-0"><%= chartPoints.length === 1 ? 'Complete another scored interview to see how your results change over time.' : 'Complete and score at least two interviews to unlock your progress graph.' %></p>
+                    </div>
+                <% } %>
+
+                <% if (topicPerformance.length) { %>
+                    <div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-1">Topic mastery</h6>
+                                <p class="small text-muted mb-0">Average scores by topic across recent completed interviews.</p>
+                            </div>
+                            <span class="small text-muted">Lower scores highlight useful revision areas</span>
+                        </div>
+                        <div class="row g-3">
+                            <% topicPerformance.forEach((item) => { %>
+                                <div class="col-md-6">
+                                    <div class="border rounded-3 p-3 h-100">
+                                        <div class="d-flex justify-content-between gap-2 mb-2">
+                                            <span class="small fw-semibold text-dark"><%= item.topic %></span>
+                                            <span class="small fw-bold text-primary"><%= item.percentage %>%</span>
+                                        </div>
+                                        <div class="progress" role="progressbar" aria-label="<%= item.topic %> average score" aria-valuenow="<%= item.percentage %>" aria-valuemin="0" aria-valuemax="100" style="height: 8px;">
+                                            <div class="progress-bar rounded-pill <%= item.percentage >= 70 ? 'bg-success' : item.percentage >= 40 ? 'bg-warning' : 'bg-danger' %>" style="width: <%= item.percentage %>%"></div>
+                                        </div>
+                                        <div class="small text-muted mt-2"><%= item.questionCount %> scored <%= item.questionCount === 1 ? 'question' : 'questions' %></div>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+            </section>
+
+            <section class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">Compare two completed attempts</h5>
+                        <p class="small text-muted mb-0">Differences use stored overall percentages and recorded question kinds/topics only.</p>
+                    </div>
+                </div>
+                <% if (totalAttempts < 2) { %>
+                    <p class="small text-muted mb-0"><%= totalAttempts === 0 ? 'Score trends and comparisons use completed reports only; active question progress appears below.' : 'You have one completed interview. Complete another to compare results and see your progress over time.' %></p>
+                <% } else { %>
+                    <form id="comparisonForm" class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label for="firstAttempt" class="form-label small fw-semibold text-secondary">Earlier attempt</label>
+                            <select id="firstAttempt" class="form-select bg-light border-0" required>
+                                <% attempts.forEach((item, index) => { %>
+                                    <option value="<%= item.id %>" <%= index === 1 ? 'selected' : '' %>><%= item.responseMode === 'open-ended' ? 'Self-rating' : 'Multiple-choice' %> · <%= item.language %> · <%= item.difficulty %> · <%= new Date(item.completedAt).toLocaleString() %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="secondAttempt" class="form-label small fw-semibold text-secondary">Later attempt</label>
+                            <select id="secondAttempt" class="form-select bg-light border-0" required>
+                                <% attempts.forEach((item, index) => { %>
+                                    <option value="<%= item.id %>" <%= index === 0 ? 'selected' : '' %>><%= item.responseMode === 'open-ended' ? 'Self-rating' : 'Multiple-choice' %> · <%= item.language %> · <%= item.difficulty %> · <%= new Date(item.completedAt).toLocaleString() %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary rounded-pill fw-semibold w-100">Compare</button>
+                        </div>
+                    </form>
+                    <div id="comparisonMessage" class="small mt-3" role="status" aria-live="polite"></div>
+                    <div id="comparisonResults" class="mt-3"></div>
+                    <% if (attempts.length < 2) { %>
+                        <p class="small text-muted mt-3 mb-0">Other attempts are on another page. Use the page controls below to review them.</p>
+                    <% } %>
+                <% } %>
+            </section>
+
+            <section class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                <div class="mb-3">
+                    <h5 class="fw-bold text-dark mb-1">Active interview progress</h5>
+                    <p class="small text-muted mb-0"><%= activeAttemptCount %> active <%= activeAttemptCount === 1 ? 'interview' : 'interviews' %></p>
+                </div>
+                <% if (!activeAttempts.length) { %>
+                    <p class="small text-muted mb-0">No interviews in progress. Start a mock interview and your answer progress will appear here.</p>
+                <% } else { %>
+                    <div class="d-grid gap-2">
+                        <% activeAttempts.forEach((item) => { %>
+                            <% const progress = Math.round((item.currentQuestion / 15) * 100); %>
+                            <article class="border rounded-3 p-3">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-2">
+                                    <div>
+                                        <div class="fw-semibold text-dark"><%= item.language %> · <%= item.difficulty %></div>
+                                        <div class="small text-muted"><%= item.status === 'report-pending' ? 'All 15 answers saved · Final report not yet submitted' : `${item.currentQuestion} of 15 ${item.responseMode === 'multiple-choice' ? 'answers saved' : 'responses self-rated'}${item.awaitingScore && item.responseMode !== 'multiple-choice' ? ' · Review your latest response and save a self-rating to continue' : ''}` %> · Started <%= new Date(item.createdAt).toLocaleString() %></div>
+                                    </div>
+                                    <a href="/ai/mock-interview?session=<%= encodeURIComponent(item.id) %>" class="btn btn-sm btn-outline-primary rounded-pill"><%= item.status === 'report-pending' ? 'Submit interview' : item.awaitingScore ? 'Review response' : 'Resume interview' %></a>
+                                </div>
+                                <div class="progress" role="progressbar" aria-label="Interview answer progress" aria-valuenow="<%= progress %>" aria-valuemin="0" aria-valuemax="100">
+                                    <div class="progress-bar" style="width: <%= progress %>%"><%= progress %>% saved</div>
+                                </div>
+                            </article>
+                        <% }) %>
+                    </div>
+                    <% if (activeAttemptCount > activeAttempts.length) { %>
+                        <p class="small text-muted mt-3 mb-0">Showing the 10 most recently active interviews.</p>
+                    <% } %>
+                <% } %>
+            </section>
+
+            <section class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <h5 class="fw-bold text-dark mb-1">Completed interview history</h5>
+                        <p class="small text-muted mb-0"><%= totalAttempts %> completed <%= totalAttempts === 1 ? 'attempt' : 'attempts' %></p>
+                    </div>
+                    <a href="/ai/mock-interview" class="btn btn-sm btn-outline-primary rounded-pill">Start a mock interview</a>
+                </div>
+                <% if (!attempts.length) { %>
+                    <p class="small text-muted mb-0">No completed interviews yet. Your results and recommendations will be saved here after you complete a mock interview.</p>
+                <% } else { %>
+                    <div class="d-grid gap-2">
+                        <% attempts.forEach((item) => { %>
+                            <article class="d-flex flex-wrap justify-content-between align-items-center gap-3 border rounded-3 p-3">
+                                <div>
+                                    <div class="fw-semibold text-dark"><%= item.language %> · <%= item.difficulty %></div>
+                                    <div class="small text-muted"><%= new Date(item.completedAt).toLocaleString() %> · <%= item.responseMode === 'open-ended' ? 'Self-rating' : 'MCQ score' %>: <%= item.percentage === null ? 'unavailable' : `${item.percentage}%` %><%= item.totalScore === null ? '' : ` · ${item.totalScore}/150 points` %></div>
+                                    <% if (item.performanceSummary) { %><div class="small text-muted mt-1"><%= item.performanceSummary %></div><% } %>
+                                </div>
+                                <a href="/ai/mock-interview/tracker/<%= encodeURIComponent(item.id) %>" class="btn btn-sm btn-outline-primary rounded-pill">View detailed report</a>
+                            </article>
+                        <% }) %>
+                    </div>
+                    <% if (pageCount > 1) { %>
+                        <nav class="d-flex justify-content-between align-items-center mt-3" aria-label="Interview history pages">
+                            <% if (page > 1) { %><a class="btn btn-sm btn-outline-secondary rounded-pill" href="/ai/mock-interview/tracker?page=<%= page - 1 %>">Previous</a><% } else { %><span></span><% } %>
+                            <span class="small text-muted">Page <%= page %> of <%= pageCount %></span>
+                            <% if (page < pageCount) { %><a class="btn btn-sm btn-outline-secondary rounded-pill" href="/ai/mock-interview/tracker?page=<%= page + 1 %>">Next</a><% } else { %><span></span><% } %>
+                        </nav>
+                    <% } %>
+                <% } %>
+            </section>
+        <% } %>
+    </main>
+    <%- include('partials/footer') %>
+</div>
+
+<% if (typeof attempt === 'undefined' || !attempt) { %>
+    <script>
+        (() => {
+            const form = document.getElementById('comparisonForm');
+            if (!form) return;
+            const message = document.getElementById('comparisonMessage');
+            const results = document.getElementById('comparisonResults');
+            const firstAttempt = document.getElementById('firstAttempt');
+            const secondAttempt = document.getElementById('secondAttempt');
+
+            function addText(parent, tag, text, className = '') {
+                const node = document.createElement(tag);
+                node.textContent = text;
+                if (className) node.className = className;
+                parent.append(node);
+                return node;
+            }
+
+            function formatScore(value) {
+                return value === null ? 'Not stored' : `${value}%`;
+            }
+
+            function renderMetric(parent, metric) {
+                const row = document.createElement('tr');
+                addText(row, 'th', metric.name, 'fw-semibold');
+                addText(row, 'td', formatScore(metric.before));
+                addText(row, 'td', formatScore(metric.after));
+                const change = metric.change === null
+                    ? 'Not comparable'
+                    : `${metric.change > 0 ? '+' : ''}${metric.change} pp · ${metric.direction}`;
+                addText(row, 'td', change, metric.direction === 'improved'
+                    ? 'text-success fw-semibold'
+                    : metric.direction === 'declined' ? 'text-danger fw-semibold' : 'text-muted');
+                parent.append(row);
+            }
+
+            function renderTable(title, metrics) {
+                if (!metrics.length) return null;
+                const section = document.createElement('section');
+                section.className = 'mb-4';
+                addText(section, 'h6', title, 'fw-bold text-dark');
+                const table = document.createElement('div');
+                table.className = 'table-responsive';
+                const tableElement = document.createElement('table');
+                tableElement.className = 'table table-sm align-middle mb-0';
+                const head = document.createElement('thead');
+                const header = document.createElement('tr');
+                ['Measure', 'Earlier', 'Later', 'Change'].forEach((label) => addText(header, 'th', label, 'small text-muted'));
+                head.append(header);
+                const body = document.createElement('tbody');
+                metrics.forEach((metric) => renderMetric(body, metric));
+                tableElement.append(head, body);
+                table.append(tableElement);
+                section.append(table);
+                return section;
+            }
+
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                results.replaceChildren();
+                message.className = 'small mt-3 text-muted';
+                if (firstAttempt.value === secondAttempt.value) {
+                    message.textContent = 'Select two different attempts to compare.';
+                    message.className = 'small mt-3 text-danger';
+                    return;
+                }
+                message.textContent = 'Comparing stored interview results...';
+                try {
+                    const query = new URLSearchParams({
+                        firstId: firstAttempt.value,
+                        secondId: secondAttempt.value
+                    });
+                    const response = await fetch(`/ai/mock-interview/tracker/compare?${query}`, {
+                        credentials: 'same-origin',
+                        headers: { Accept: 'application/json' }
+                    });
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || 'The attempts could not be compared.');
+                    }
+                    const comparison = result.comparison;
+                    const heading = comparison.overall.direction === 'improved'
+                        ? 'Overall score improved'
+                        : comparison.overall.direction === 'declined'
+                            ? 'Overall score declined'
+                            : comparison.overall.direction === 'unchanged'
+                                ? 'Overall score is unchanged'
+                                : 'Overall score comparison unavailable';
+                    addText(results, 'h5', heading, 'fw-bold text-dark mb-3');
+                    const overallTable = renderTable('Overall score', [comparison.overall]);
+                    if (overallTable) results.append(overallTable);
+                    const kindTable = renderTable('Question-kind scores', comparison.kinds);
+                    if (kindTable) results.append(kindTable);
+                    const topicTable = renderTable('Topic scores', comparison.topics);
+                    if (topicTable) results.append(topicTable);
+                    if (!comparison.kinds.length && !comparison.topics.length) {
+                        addText(results, 'p', 'No scored category data is available for these attempts.', 'small text-muted');
+                    }
+                    message.textContent = 'Comparison uses only stored scores. A category shown as not comparable was not present in both reports.';
+                    message.className = 'small mt-3 text-muted';
+                } catch (error) {
+                    message.textContent = error.message;
+                    message.className = 'small mt-3 text-danger';
+                }
+            });
+        })();
+    </script>
+<% } %>

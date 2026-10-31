@@ -1,0 +1,56 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+    <div class="sidebar-page-content">
+    <main class="container-fluid py-4 px-4">
+        <div class="mb-4 app-page-heading">
+            <h2 class="fw-bold text-dark mb-1"><i class="ri-list-check text-primary me-2"></i>Application Tracker</h2>
+            <p class="text-muted mb-0">Keep track of the jobs and internships you have applied to.</p>
+        </div>
+
+        <% if (selectedApplication) { %>
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="badge bg-primary-subtle text-primary mb-2"><%= selectedApplication.type %></span>
+                        <h4 class="fw-bold mb-1"><%= selectedApplication.opportunity?.title || 'Opportunity no longer available' %></h4>
+                        <p class="text-muted mb-0"><%= selectedApplication.opportunity?.company || 'Details unavailable' %><% if (selectedApplication.opportunity?.location) { %> · <%= selectedApplication.opportunity.location %><% } %></p>
+                    </div>
+                    <span class="badge bg-warning-subtle text-warning"><%= selectedApplication.status %></span>
+                </div>
+                <p class="small text-muted mt-3 mb-0">Applied <%= selectedApplication.createdAt ? new Date(selectedApplication.createdAt).toLocaleDateString() : 'date unavailable' %></p>
+            </div>
+        <% } %>
+
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <% if (applications.length) { %>
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead class="table-light">
+                            <tr><th class="px-4 py-3">Role</th><th>Company</th><th>Type</th><th>Applied</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <% applications.forEach((application) => { %>
+                                <tr>
+                                    <td class="px-4 py-3 fw-semibold"><a class="text-decoration-none" href="/applications/view/<%= application._id %>"><%= application.opportunity?.title || 'Opportunity no longer available' %></a></td>
+                                    <td><%= application.opportunity?.company || 'Details unavailable' %></td>
+                                    <td><%= application.type %></td>
+                                    <td><%= application.createdAt ? new Date(application.createdAt).toLocaleDateString() : '—' %></td>
+                                    <td><span class="badge bg-warning-subtle text-warning"><%= application.status %></span></td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="text-center py-5 px-3">
+                    <i class="ri-folder-open-line fs-1 text-primary"></i>
+                    <h5 class="fw-bold mt-2">No applications yet</h5>
+                    <p class="text-muted mb-3">Applications you track from job or internship listings will appear here.</p>
+                    <a class="btn btn-primary rounded-pill px-4" href="/jobs">Explore opportunities</a>
+                </div>
+            <% } %>
+        </div>
+    </main>
+    
+    </div>
+</body>

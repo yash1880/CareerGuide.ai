@@ -1,0 +1,347 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+
+<!-- 1. Hero Section -->
+<div class="d-flex align-items-center py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); min-height: calc(100vh - 76px);">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 text-lg-start text-center">
+                <div class="d-inline-flex align-items-center gap-2 bg-primary-subtle text-primary border border-primary border-opacity-25 mb-4 px-3 py-2 rounded-pill fw-semibold small shadow-sm">
+                    <i class="ri-sparkles-fill"></i> AI-Powered Career Guidance Platform
+                </div>
+                <h1 class="display-4 fw-bold mb-4 text-dark" style="letter-spacing: -1px; line-height: 1.2;">
+                    Shape Your Future with <span class="text-primary">Smart AI Insights</span>
+                </h1>
+                <p class="lead text-muted mb-4" style="font-size: 1.1rem; line-height: 1.6;">
+                    Get personalized career paths, AI mock interviews, real-time ATS resume scoring, and direct job matches all in one place.
+                </p>
+                <div class="d-flex justify-content-center justify-content-lg-start align-items-center gap-3 flex-wrap">
+                    <a href="/auth/register" class="btn btn-primary px-4 py-3 rounded-pill fw-semibold shadow-lg d-flex align-items-center gap-2">
+                        Get Started Free <i class="ri-arrow-right-line"></i>
+                    </a>
+                    <a href="/jobs" class="btn btn-outline-dark px-4 py-3 rounded-pill fw-semibold">
+                        Explore Jobs
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="p-3 bg-white border border-light rounded-5 shadow-lg position-relative overflow-hidden">
+                   <img src="/assets/images/hero-img.jpeg" alt="AI Career Guidance" class="img-fluid rounded-3" style="height: 400px; object-fit: cover;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Live Stats Counter Section -->
+<div class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3 col-6">
+                <h2 class="fw-bold display-5 mb-1">50K+</h2>
+                <p class="text-white-50 small mb-0">Active Job Seekers</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-bold display-5 mb-1">95%</h2>
+                <p class="text-white-50 small mb-0">ATS Accuracy Rate</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-bold display-5 mb-1">1,200+</h2>
+                <p class="text-white-50 small mb-0">Partner Companies</p>
+            </div>
+            <div class="col-md-3 col-6">
+                <h2 class="fw-bold display-5 mb-1">24/7</h2>
+                <p class="text-white-50 small mb-0">AI Counselor Support</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Core Features Grid -->
+<div class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase">Core Capabilities</h6>
+            <h2 class="fw-bold text-dark display-6">Everything You Need to Accelerate Your Career</h2>
+            <p class="text-muted mx-auto" style="max-width: 600px;">Our platform combines advanced AI tools with comprehensive databases to guide you at every step.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <div class="bg-primary-subtle text-primary p-3 rounded-3 d-inline-block mb-3" style="width: fit-content;"><i class="ri-road-map-line fs-4"></i></div>
+                    <h5 class="fw-bold text-dark mb-2">Smart Career Roadmaps</h5>
+                    <p class="text-muted small mb-0">Get step-by-step guidance tailored to your technical skills, experience level, and long-term goals.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <div class="bg-success-subtle text-success p-3 rounded-3 d-inline-block mb-3" style="width: fit-content;"><i class="ri-file-check-line fs-4"></i></div>
+                    <h5 class="fw-bold text-dark mb-2">Real-Time ATS Checker</h5>
+                    <p class="text-muted small mb-0">Analyze your resume against job descriptions to get instant ATS scores, keyword highlights, and fix suggestions.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <div class="bg-warning-subtle text-warning p-3 rounded-3 d-inline-block mb-3" style="width: fit-content;"><i class="ri-briefcase-line fs-4"></i></div>
+                    <h5 class="fw-bold text-dark mb-2">Direct Job Matches</h5>
+                    <p class="text-muted small mb-0">Browse through curated job listings and active internship opportunities matching your tech stack.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. How It Works Section -->
+<div class="py-5 bg-light border-top border-bottom">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase">Simple Process</h6>
+            <h2 class="fw-bold text-dark display-6">How CareerGuide.ai Works</h2>
+            <p class="text-muted mx-auto" style="max-width: 500px;">Get started in 3 simple steps and land your dream job faster.</p>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="bg-primary text-white fw-bold rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">1</div>
+                    <h5 class="fw-bold text-dark mb-2">Create Your Profile</h5>
+                    <p class="text-muted small mb-0">Sign up and input your tech stack, education, and career aspirations.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="bg-primary text-white fw-bold rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">2</div>
+                    <h5 class="fw-bold text-dark mb-2">Analyze & Optimize</h5>
+                    <p class="text-muted small mb-0">Use our AI ATS checker and follow personalized skill roadmaps.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 shadow-sm h-100">
+                    <div class="bg-primary text-white fw-bold rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 50px; height: 50px;">3</div>
+                    <h5 class="fw-bold text-dark mb-2">Apply & Get Hired</h5>
+                    <p class="text-muted small mb-0">Apply directly to curated tech jobs and prepare with mock interviews.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 5. Popular Tech Stacks Section -->
+<div class="py-5 bg-white">
+    <div class="container py-4 text-center">
+        <h6 class="text-primary fw-bold text-uppercase">Trending Domains</h6>
+        <h2 class="fw-bold text-dark display-6 mb-3">Explore Roles By Tech Stack</h2>
+        <p class="text-muted mx-auto mb-5" style="max-width: 500px;">Find specialized guidance and roadmaps for modern software engineering stacks.</p>
+        
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 border rounded-4 bg-light shadow-sm">
+                    <i class="ri-reactjs-line text-primary fs-1 mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">MERN Stack</h5>
+                    <p class="text-muted small mb-0">React, Node, Express, MongoDB</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 border rounded-4 bg-light shadow-sm">
+                    <i class="ri-brain-line text-success fs-1 mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">AI & Data Science</h5>
+                    <p class="text-muted small mb-0">Python, Machine Learning, NLP</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 border rounded-4 bg-light shadow-sm">
+                    <i class="ri-cloud-line text-warning fs-1 mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">Cloud & DevOps</h5>
+                    <p class="text-muted small mb-0">Docker, Kubernetes, AWS</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 border rounded-4 bg-light shadow-sm">
+                    <i class="ri-smartphone-line text-danger fs-1 mb-2"></i>
+                    <h5 class="fw-bold text-dark mb-1">Mobile Development</h5>
+                    <p class="text-muted small mb-0">Flutter, React Native, iOS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 6. AI Mock Interview Spotlight -->
+<div class="py-5 bg-light">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <div class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-semibold mb-3">
+                    <i class="ri-mic-line me-1"></i> Interactive Feature
+                </div>
+                <h2 class="fw-bold text-dark display-6 mb-3">Ace Your Interviews with AI Mock Practice</h2>
+                <p class="text-muted mb-4">Practice technical and HR interview questions tailored to your target company. Receive instant feedback on your tone, structure, and keyword usage.</p>
+                <ul class="list-unstyled text-secondary mb-4">
+                    <li class="mb-2"><i class="ri-check-line text-success me-2"></i> Real-time audio/text evaluation</li>
+                    <li class="mb-2"><i class="ri-check-line text-success me-2"></i> Company-specific question banks</li>
+                    <li class="mb-2"><i class="ri-check-line text-success me-2"></i> Detailed performance scorecards</li>
+                </ul>
+                <a href="/auth/register" class="btn btn-dark px-4 py-2 rounded-pill fw-semibold">Try Mock Interview</a>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="p-4 bg-white rounded-4 shadow-sm border">
+                    <div class="d-flex align-items-center gap-3 mb-3 border-bottom pb-3">
+                        <div class="bg-primary text-white rounded-circle p-2"><i class="ri-robot-2-fill"></i></div>
+                        <div class="text-start">
+                            <h6 class="fw-bold mb-0 text-dark">AI Interviewer Bot</h6>
+                            <small class="text-muted">Active Session - System Design</small>
+                        </div>
+                    </div>
+                    <p class="text-start bg-light p-3 rounded-3 text-muted small mb-3">"Can you explain how you handle horizontal scaling and database indexing in a high-traffic Node.js application?"</p>
+                    <div class="text-end">
+                        <span class="badge bg-primary-subtle text-primary">Listening...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 7. Success Testimonials Section -->
+<div class="py-5 bg-white">
+    <div class="container py-4">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase">Testimonials</h6>
+            <h2 class="fw-bold text-dark display-6">Loved by Developers & Students</h2>
+            <p class="text-muted">See how CareerGuide.ai helped professionals transition into top tech roles.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <p class="text-muted small fst-italic mb-3">"The ATS resume checker gave me precise feedback that instantly boosted my callback rate. Landed my first full-stack role within 3 weeks!"</p>
+                    <div class="d-flex align-items-center gap-3 mt-auto">
+                        <div class="bg-primary text-white fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">YB</div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark small">Yash B.</h6>
+                            <small class="text-muted">Full Stack Developer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <p class="text-muted small fst-italic mb-3">"The career roadmaps removed all guesswork. I knew exactly what to study every week without getting overwhelmed by tutorials."</p>
+                    <div class="d-flex align-items-center gap-3 mt-auto">
+                        <div class="bg-success text-white fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">RP</div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark small">Rahul P.</h6>
+                            <small class="text-muted">Software Engineer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-light">
+                    <p class="text-muted small fst-italic mb-3">"AI mock interviews built my confidence completely. The feedback on structuring behavioral answers was a total game-changer."</p>
+                    <div class="d-flex align-items-center gap-3 mt-auto">
+                        <div class="bg-warning text-white fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">AK</div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark small">Ananya K.</h6>
+                            <small class="text-muted">Frontend Developer</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed FAQ Section (Light Theme with Bootstrap Animations) -->
+<div class="py-5 bg-light border-top">
+    <div class="container py-4" style="max-width: 800px;">
+        <div class="text-center mb-5">
+            <h6 class="text-primary fw-bold text-uppercase">Got Questions?</h6>
+            <h2 class="fw-bold text-dark display-6">Frequently Asked Questions</h2>
+            <p class="text-muted">Everything you need to know about the platform, ATS checking, and career features.</p>
+        </div>
+        
+        <div class="accordion" id="faqAccordion">
+            <!-- FAQ Item 1 -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        How does the real-time ATS resume checker work?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted small">
+                        Our ATS system scans your resume against target job descriptions using advanced NLP and keyword-matching algorithms. It evaluates formatting compatibility, structural completeness, and missing skill keywords, delivering a precise match score along with clear, actionable fix suggestions.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Is CareerGuide.ai free to use for students and developers?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted small">
+                        Yes, absolutely! We provide a robust free tier that gives you complete access to standard career roadmaps, job board browsing, active internship listings, and basic resume analysis tools to accelerate your job search without any charges.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Can I get direct job and internship recommendations?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted small">
+                        Yes. Once you set up your profile, input your technical skills, and specify your preferred tech stack (such as MERN, Python, Cloud, etc.), our system automatically filters and curates direct job openings and internship matches suited specifically for your level.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        How do the structured career roadmaps help me?
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted small">
+                        Our career roadmaps remove all tutorial hell and guesswork by breaking down complex engineering domains into week-by-week learning milestones, hands-on project ideas, and essential skill checkpoints tailored for modern industry standards.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Item 5 -->
+            <div class="accordion-item border-0 mb-3 shadow-sm rounded-3 overflow-hidden">
+                <h2 class="accordion-header" id="headingFive">
+                    <button class="accordion-button collapsed fw-semibold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                        How secure is my account and personal data?
+                    </button>
+                </h2>
+                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body text-muted small">
+                        Your data security is our top priority. We use industry-standard `bcryptjs` encryption to securely hash all passwords before saving user credentials directly into our protected MongoDB database, ensuring complete confidentiality.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Final Call to Action Banner (Light Theme) -->
+<div class="py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); border-top: 1px solid #e2e8f0;">
+    <div class="container py-4 text-center">
+        <h2 class="fw-bold text-dark mb-3">Ready to Take Control of Your Career?</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 500px;">Join thousands of students and developers landing their dream roles with AI assistance.</p>
+        <a href="/auth/register" class="btn btn-primary px-5 py-3 rounded-pill fw-semibold shadow-lg">
+            Create Free Account <i class="ri-arrow-right-line ms-1"></i>
+        </a>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

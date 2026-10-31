@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CareerGuide.ai</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="bg-body-tertiary">
+    <%- include('partials/sidebar') %>
+
+    <!-- MAIN WORKSPACE AREA -->
+    <div class="sidebar-page-content min-vh-100 p-4">
+        <div class="container-fluid dashboard-content">
+
+            <!-- Existing Welcome Header -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center bg-white p-4 rounded-4 shadow-sm mb-4 border gap-3">
+                <div>
+                    <h4 class="fw-bold text-dark mb-1">Welcome back, <%= (user && user.name) ? user.name : 'Developer' %>! 👋</h4>
+                    <p class="text-muted small mb-0">Track your resume ATS score, career roadmaps, and active job applications.</p>
+                </div>
+                <div class="d-flex align-items-center flex-wrap gap-3">
+                    <div class="bg-light px-3 py-2 rounded-pill border d-flex align-items-center gap-2">
+                        <i class="ri-flashlight-fill text-warning"></i>
+                        <span class="small fw-bold text-black">500 / 500 AI Credits</span>
+                    </div>
+                    <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-semibold small border border-success border-opacity-25">
+                        <i class="ri-checkbox-circle-fill me-1"></i> Pro Plan
+                    </span>
+                    <a href="/resume-ats" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold small shadow-sm">
+                        <i class="ri-sparkles-line me-1"></i> Run ATS Scan
+                    </a>
+                </div>
+            </div>
+
+            <!-- Existing Quick Actions -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <a href="/jobs" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none bg-white h-100 tool-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 fs-4">
+                                <i class="ri-briefcase-4-line"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Explore Jobs</h5>
+                                <p class="text-muted small mb-0">Browse latest tech openings</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="/internships" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none bg-white h-100 tool-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 fs-4">
+                                <i class="ri-graduation-cap-line"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">Internships</h5>
+                                <p class="text-muted small mb-0">Find startup & remote roles</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-md-4">
+                    <a href="/resume-ats" class="card border-0 shadow-sm rounded-4 p-4 text-decoration-none bg-white h-100 tool-card">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3 fs-4">
+                                <i class="ri-file-text-line"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1">ATS Checker</h5>
+                                <p class="text-muted small mb-0">Scan your resume score</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Existing Statistics -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small fw-semibold text-uppercase tracking-wider">ATS Resume Score</span>
+                            <div class="bg-primary-subtle text-primary p-2.5 rounded-3"><i class="ri-file-chart-line fs-5"></i></div>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-0"><%= (user && user.atsScore !== undefined && user.atsScore !== null) ? user.atsScore : 0 %>%</h3>
+                        <p class="text-muted x-small mb-0 mt-1">Upload resume to calculate score</p>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small fw-semibold text-uppercase tracking-wider">Active Applications</span>
+                            <div class="bg-warning-subtle text-warning p-2.5 rounded-3"><i class="ri-briefcase-4-line fs-5"></i></div>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-0"><%= (applications && applications.length !== undefined) ? applications.length : 0 %></h3>
+                        <p class="text-muted x-small mb-0 mt-1">Track your job pipeline</p>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small fw-semibold text-uppercase tracking-wider">AI Mock Practice</span>
+                            <div class="bg-success-subtle text-success p-2.5 rounded-3"><i class="ri-robot-2-line fs-5"></i></div>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-0"><%= (user && user.mockScore !== undefined && user.mockScore !== null) ? user.mockScore : '0.0' %>/10</h3>
+                        <p class="text-muted x-small mb-0 mt-1">Take your first mock test</p>
+                    </div>
+                </div>
+
+               <div class="col-xl-3 col-sm-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="text-muted small fw-semibold text-uppercase tracking-wider">Roadmap Progress</span>
+                            <div class="bg-info-subtle text-info p-2.5 rounded-3"><i class="ri-road-map-line fs-5"></i></div>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-0"><%= (user && user.roadmapProgress !== undefined && user.roadmapProgress !== null) ? user.roadmapProgress : 0 %>%</h3>
+                        <div class="progress mt-2 w-100 rounded-pill" style="height: 5px;">
+                            <div class="progress-bar bg-info rounded-pill" style="width: <%= (user && user.roadmapProgress !== undefined && user.roadmapProgress !== null) ? user.roadmapProgress : 0 %>%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. CAREER READINESS SCORE -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-shield-star-line text-primary me-2"></i> Career Readiness</h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-success-subtle text-success px-3 py-2 rounded-pill fw-semibold">On Track</span>
+                                <a href="/skills" class="text-decoration-none small fw-semibold text-primary">View Full Report</a>
+                            </div>
+                        </div>
+                        <div class="row align-items-center g-4">
+                            <div class="col-md-3 text-center border-end">
+                                <div class="rounded-circle bg-primary bg-opacity-10 d-flex flex-column align-items-center justify-content-center mx-auto" style="width: 110px; height: 110px;">
+                                    <h3 class="fw-bold text-primary mb-0">82%</h3>
+                                    <span class="text-muted" style="font-size: 10px;">Overall Score</span>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between small fw-semibold mb-1"><span>Profile Readiness</span><span class="text-success">90%</span></div>
+                                            <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-success rounded-pill" style="width: 90%;"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex justify-content-between small fw-semibold mb-1"><span>Skill Readiness</span><span class="text-primary">85%</span></div>
+                                            <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-primary rounded-pill" style="width: 85%;"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between small fw-semibold mb-1"><span>Resume Readiness</span><span class="text-warning">75%</span></div>
+                                            <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-warning rounded-pill" style="width: 75%;"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex justify-content-between small fw-semibold mb-1"><span>Interview & Project</span><span class="text-info">80%</span></div>
+                                            <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-info rounded-pill" style="width: 80%;"></div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. YOUR CAREER MATCH -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-user-star-line text-success me-2"></i> Your Career Match</h5>
+                            <span class="text-muted small">Personalized based on MERN Stack skills</span>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">Frontend Dev</h6>
+                                            <span class="badge bg-success text-white x-small">92%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Strong match for React, JavaScript & Tailwind.</p>
+                                        <div class="x-small text-muted mb-3">Skills: React, JS, CSS</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">Full Stack Dev</h6>
+                                            <span class="badge bg-success text-white x-small">87%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Matches Node.js, Express & MongoDB backend setup.</p>
+                                        <div class="x-small text-muted mb-3">Skills: MERN, REST APIs</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">Backend Dev</h6>
+                                            <span class="badge bg-primary text-white x-small">81%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Fits server-side routing & database schema tasks.</p>
+                                        <div class="x-small text-muted mb-3">Skills: Node.js, Mongo</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">UI/UX Designer</h6>
+                                            <span class="badge bg-warning text-dark x-small">74%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Based on responsive interface & template layout work.</p>
+                                        <div class="x-small text-muted mb-3">Skills: Bootstrap, CSS</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">Data Analyst</h6>
+                                            <span class="badge bg-secondary text-white x-small">65%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Foundational analytics and query understanding.</p>
+                                        <div class="x-small text-muted mb-3">Skills: SQL, Queries</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-dark small mb-0">DevOps Engineer</h6>
+                                            <span class="badge bg-secondary text-white x-small">60%</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-2">Basic GitHub version control and deployment knowledge.</p>
+                                        <div class="x-small text-muted mb-3">Skills: Git, GitHub</div>
+                                    </div>
+                                    <a href="/jobs" class="btn btn-sm btn-outline-primary rounded-pill fw-semibold w-100 x-small">View Career</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. CAREER JOURNEY -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-road-map-line text-warning me-2"></i> Career Journey Progress</h5>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 text-center overflow-x-auto py-2">
+                            <div class="px-3 py-2 bg-success text-white rounded-3 small fw-semibold flex-grow-1">1. Profile <br><span class="x-small fw-normal">Completed</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-success text-white rounded-3 small fw-semibold flex-grow-1">2. Assessment <br><span class="x-small fw-normal">Completed</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-success text-white rounded-3 small fw-semibold flex-grow-1">3. Career Match <br><span class="x-small fw-normal">Completed</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-primary text-white rounded-3 small fw-semibold flex-grow-1">4. Skill Gap <br><span class="x-small fw-normal">Current</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-light text-dark border rounded-3 small fw-semibold flex-grow-1">5. Roadmap <br><span class="x-small text-muted fw-normal">Upcoming</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-light text-dark border rounded-3 small fw-semibold flex-grow-1">6. Resume <br><span class="x-small text-muted fw-normal">Upcoming</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-light text-dark border rounded-3 small fw-semibold flex-grow-1">7. Mock Interview <br><span class="x-small text-muted fw-normal">Upcoming</span></div>
+                            <i class="ri-arrow-right-s-line text-muted fs-5"></i>
+                            <div class="px-3 py-2 bg-light text-dark border rounded-3 small fw-semibold flex-grow-1">8. Job Application <br><span class="x-small text-muted fw-normal">Upcoming</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 & 5. NEXT BEST ACTION + WHAT SHOULD I DO TODAY? -->
+            <div class="row g-4 mb-4">
+                <!-- 5. Next Best Action -->
+                <div class="col-lg-5">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100 border-start border-success border-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-success-subtle text-success fw-semibold px-2.5 py-1 rounded-pill">
+                                <i class="ri-lightbulb-flash-line me-1"></i> Recommended Next Step
+                            </span>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Improve your React skills before applying for Frontend internships.</h5>
+                        <p class="text-muted small mb-3">Our AI analyzer detected a small gap in advanced state management concepts (Redux Toolkit).</p>
+                        <div class="bg-light p-3 rounded-3 mb-3 x-small text-muted">
+                            <strong>Expected Benefit:</strong> Boosts your match rate from 92% to 98% for tier-1 tech companies.
+                        </div>
+                        <a href="/roadmap" class="btn btn-sm btn-success rounded-pill px-4 fw-semibold w-100">Start Recommended Task</a>
+                    </div>
+                </div>
+
+                <!-- 4. What Should I Do Today? -->
+                <div class="col-lg-7">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-calendar-check-line text-primary me-2"></i> What Should I Do Today?</h5>
+                            <span class="badge bg-primary-subtle text-primary">Est. 45 mins</span>
+                        </div>
+                        <div class="d-flex flex-column gap-3 mb-3">
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="ri-checkbox-circle-fill text-success fs-5"></i>
+                                    <span class="small fw-semibold text-dark text-decoration-line-through">Complete React assessment</span>
+                                </div>
+                                <span class="badge bg-success-subtle text-success x-small">Done</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="ri-arrow-right-circle-line text-primary fs-5"></i>
+                                    <span class="small fw-semibold text-dark">Improve GitHub README documentation</span>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary x-small">15m</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="ri-checkbox-blank-circle-line text-muted fs-5"></i>
+                                    <span class="small fw-semibold text-dark">Apply to 2 matching internships</span>
+                                </div>
+                                <span class="badge bg-secondary-subtle text-secondary x-small">20m</span>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-light">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="ri-checkbox-blank-circle-line text-muted fs-5"></i>
+                                    <span class="small fw-semibold text-dark">Practice 5 interview questions</span>
+                                </div>
+                                <span class="badge bg-secondary-subtle text-secondary x-small">10m</span>
+                            </div>
+                        </div>
+                        <a href="/roadmap" class="btn btn-sm btn-primary rounded-pill px-4 fw-semibold w-100">Start Next Task</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 & 7. SKILL GROWTH + CAREER MOMENTUM -->
+            <div class="row g-4 mb-4">
+                <!-- 6. Skill Growth -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-line-chart-line text-info me-2"></i> Skill Growth</h5>
+                            <span class="badge bg-info-subtle text-info">Compared to Last Month</span>
+                        </div>
+                        <div class="d-flex flex-column gap-3">
+                            <div>
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>JavaScript</span>
+                                    <span class="text-success fw-bold">↑ 12%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-success rounded-pill" style="width: 82%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>React</span>
+                                    <span class="text-success fw-bold">↑ 18%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-success rounded-pill" style="width: 88%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>Node.js</span>
+                                    <span class="text-success fw-bold">↑ 15%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-success rounded-pill" style="width: 78%;"></div></div>
+                            </div>
+                            <div>
+                                <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                    <span>Git</span>
+                                    <span class="text-success fw-bold">↑ 8%</span>
+                                </div>
+                                <div class="progress rounded-pill" style="height: 6px;"><div class="progress-bar bg-success rounded-pill" style="width: 70%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Career Momentum -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-fire-line text-warning me-2"></i> Career Momentum</h5>
+                            <span class="badge bg-warning-subtle text-dark fw-semibold">🔥 Strong Progress</span>
+                        </div>
+                        <p class="text-muted small mb-3">Your consistency metrics over the past 30 days:</p>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="p-3 border rounded-3 bg-light text-center">
+                                    <h3 class="fw-bold text-dark mb-0">7 Days</h3>
+                                    <span class="text-muted x-small">Learning Streak</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 border rounded-3 bg-light text-center">
+                                    <h3 class="fw-bold text-dark mb-0">12 Skills</h3>
+                                    <span class="text-muted x-small">Improved Skills</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 border rounded-3 bg-light text-center">
+                                    <h3 class="fw-bold text-dark mb-0">8</h3>
+                                    <span class="text-muted x-small">Applications Submitted</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 border rounded-3 bg-light text-center">
+                                    <h3 class="fw-bold text-dark mb-0">3</h3>
+                                    <span class="text-muted x-small">Mock Interviews Practiced</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Jobs / Internships Section -->
+            <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-list-check text-primary me-2"></i> Active Job Pipeline</h5>
+                            <a href="/jobs" class="text-decoration-none fw-semibold small text-primary">View All</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0 small">
+                                <thead class="table-light text-muted">
+                                    <tr>
+                                        <th class="py-3">Company & Role</th>
+                                        <th class="py-3">Date Applied</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3 text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (applications && applications.length > 0) { %>
+                                        <% applications.forEach(app => { %>
+                                        <tr>
+                                            <td class="py-3">
+                                                <div class="fw-bold text-dark"><%= app.companyName %></div>
+                                                <span class="text-muted x-small"><%= app.role %></span>
+                                            </td>
+                                            <td class="text-muted py-3"><%= app.dateApplied ? app.dateApplied.toDateString() : 'N/A' %></td>
+                                            <td class="py-3">
+                                                <span class="badge bg-warning-subtle text-warning px-2.5 py-1"><%= app.status || 'Applied' %></span>
+                                            </td>
+                                            <td class="text-end py-3">
+                                                <a href="/applications/view/<%= app._id %>" class="btn btn-sm btn-light border px-2.5 py-1">View</a>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4 text-muted">
+                                                <i class="ri-folder-open-line fs-3 d-block mb-2"></i>
+                                                No job applications added yet. Start tracking your applications!
+                                            </td>
+                                        </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-flashlight-line text-warning me-2"></i> AI Career Tools</h5>
+                        <div class="d-flex flex-column gap-3">
+                            <a href="/resume-maker" class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light text-decoration-none border tool-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary text-white p-2.5 rounded-2 d-flex align-items-center justify-content-center"><i class="ri-file-edit-line fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-0">AI Resume Builder</h6>
+                                        <span class="text-muted x-small">ATS-optimized templates</span>
+                                    </div>
+                                </div>
+                                <i class="ri-arrow-right-s-line text-muted"></i>
+                            </a>
+
+                            <a href="/ai/mock-interview" class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light text-decoration-none border tool-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success text-white p-2.5 rounded-2 d-flex align-items-center justify-content-center"><i class="ri-chat-voice-line fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-0">Mock Interview AI</h6>
+                                        <span class="text-muted x-small">Voice & technical Q&A</span>
+                                    </div>
+                                </div>
+                                <i class="ri-arrow-right-s-line text-muted"></i>
+                            </a>
+
+                            <a href="/roadmap" class="d-flex align-items-center justify-content-between p-3 rounded-3 bg-light text-decoration-none border tool-card">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-white p-2.5 rounded-2 d-flex align-items-center justify-content-center"><i class="ri-road-map-fill fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-0">Skill Roadmaps</h6>
+                                        <span class="text-muted x-small">Custom tech learning paths</span>
+                                    </div>
+                                </div>
+                                <i class="ri-arrow-right-s-line text-muted"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. CAREER ALERTS -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-notification-3-line text-danger me-2"></i> Career Alerts & Suggestions</h5>
+                        <div class="list-group list-group-flush gap-2">
+                            <div class="list-group-item border rounded-3 p-3 d-flex align-items-center justify-content-between bg-light">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary-subtle text-primary p-2 rounded-2"><i class="ri-briefcase-line fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-1">3 new internships match your MERN Stack profile</h6>
+                                        <span class="text-muted x-small">DevStudio India and WebCraft Digital posted junior trainee positions.</span>
+                                    </div>
+                                </div>
+                                <a href="/internships" class="btn btn-sm btn-primary rounded-pill px-3">View</a>
+                            </div>
+                            <div class="list-group-item border rounded-3 p-3 d-flex align-items-center justify-content-between bg-light">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning-subtle text-warning p-2 rounded-2"><i class="ri-file-shield-line fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-1">Resume score can be improved</h6>
+                                        <span class="text-muted x-small">Add quantifiable metrics to project descriptions for a higher ATS score.</span>
+                                    </div>
+                                </div>
+                                <a href="/resume-ats" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-3">Optimize</a>
+                            </div>
+                            <div class="list-group-item border rounded-3 p-3 d-flex align-items-center justify-content-between bg-light">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success-subtle text-success p-2 rounded-2"><i class="ri-robot-line fs-5"></i></div>
+                                    <div>
+                                        <h6 class="fw-bold text-dark small mb-1">Mock interview practice recommended</h6>
+                                        <span class="text-muted x-small">Prepare for Node.js backend architecture queries.</span>
+                                    </div>
+                                </div>
+                                <a href="/ai/mock-interview" class="btn btn-sm btn-success rounded-pill px-3">Start</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. ACHIEVEMENTS -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-award-line text-warning me-2"></i> Professional Achievements</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-brain-line text-success fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">Assessment</h6>
+                                    <span class="x-small text-muted">Completed</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-shield-check-line text-primary fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">Resume Ready</h6>
+                                    <span class="x-small text-muted">ATS Verified</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-briefcase-line text-secondary fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">First Application</h6>
+                                    <span class="x-small text-muted">Submitted</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-fire-line text-danger fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">7 Day Streak</h6>
+                                    <span class="x-small text-muted">Active Learner</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-mic-line text-info fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">Mock Interview</h6>
+                                    <span class="x-small text-muted">Completed</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-2">
+                                <div class="p-3 border rounded-4 text-center bg-light">
+                                    <i class="ri-github-fill text-dark fs-2 mb-1"></i>
+                                    <h6 class="fw-bold text-dark small mb-0">GitHub Connected</h6>
+                                    <span class="x-small text-muted">Synced</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 10. GITHUB PROJECT SHOWCASE (Preserving existing GitHub connection logic) -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-github-fill text-dark me-2"></i> GitHub Project Showcase</h5>
+                            <% if (user && user.githubLink && user.githubLink.trim() !== "") { %>
+                                <a href="<%= user.githubLink.startsWith('http') ? user.githubLink : 'https://github.com/' + user.githubLink %>" target="_blank" class="text-decoration-none small fw-semibold text-primary">View GitHub Profile</a>
+                            <% } %>
+                        </div>
+                        <div class="text-muted small mb-3">
+                            <% if (user && user.githubLink && user.githubLink.trim() !== "") { %>
+                                Connected to GitHub: <strong><%= user.githubLink %></strong>
+                            <% } else { %>
+                                <span>No GitHub profile connected yet. Update your profile to link GitHub!</span>
+                            <% } %>
+                        </div>
+
+                        <!-- Search & Filter Controls -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-0"><i class="ri-search-line text-muted"></i></span>
+                                    <input type="text" class="form-control bg-light border-0 shadow-none py-2" placeholder="Search repositories...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select bg-light border-0 shadow-none py-2">
+                                    <option selected>All Languages</option>
+                                    <option value="javascript">JavaScript</option>
+                                    <option value="react">React</option>
+                                    <option value="node">Node.js</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select bg-light border-0 shadow-none py-2">
+                                    <option selected>Sort by: Latest</option>
+                                    <option value="stars">Most Stars</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Repository Cards Grid -->
+                        <div class="row g-4">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card border rounded-4 p-3 h-100 bg-light d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold text-dark mb-0"><a href="https://github.com/yash1880/Smart-Task-Tracker" target="_blank" class="text-decoration-none text-dark">Smart Task & Habit Tracker</a></h6>
+                                            <span class="badge bg-secondary-subtle text-secondary x-small">Public</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-3">Web task tracker interface built with JavaScript.</p>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 text-muted x-small mb-3">
+                                            <span><i class="ri-circle-fill text-warning me-1"></i> JavaScript</span>
+                                            <span><i class="ri-star-line me-1"></i> 4</span>
+                                            <span><i class="ri-git-branch-line me-1"></i> 1</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <span class="text-muted" style="font-size: 11px;">Updated 3 days ago</span>
+                                            <a href="https://github.com/yash1880/Smart-Task-Tracker" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 x-small fw-semibold">View Project</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card border rounded-4 p-3 h-100 bg-light d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold text-dark mb-0"><a href="https://github.com/yash1880/Bhagwat-Gita-API" target="_blank" class="text-decoration-none text-dark">Bhagwat-Gita-API</a></h6>
+                                            <span class="badge bg-secondary-subtle text-secondary x-small">Public</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-3">Node.js and Express backend REST API repository.</p>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 text-muted x-small mb-3">
+                                            <span><i class="ri-circle-fill text-success me-1"></i> Node.js</span>
+                                            <span><i class="ri-star-line me-1"></i> 8</span>
+                                            <span><i class="ri-git-branch-line me-1"></i> 2</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <span class="text-muted" style="font-size: 11px;">Updated 1 week ago</span>
+                                            <a href="https://github.com/yash1880/Bhagwat-Gita-API" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 x-small fw-semibold">View Project</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card border rounded-4 p-3 h-100 bg-light d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold text-dark mb-0"><a href="https://github.com/yash1880" target="_blank" class="text-decoration-none text-dark">Weather Dashboard App</a></h6>
+                                            <span class="badge bg-secondary-subtle text-secondary x-small">Public</span>
+                                        </div>
+                                        <p class="text-muted x-small mb-3">Real-time weather dashboard using OpenWeatherMap API.</p>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex align-items-center gap-3 text-muted x-small mb-3">
+                                            <span><i class="ri-circle-fill text-primary me-1"></i> React</span>
+                                            <span><i class="ri-star-line me-1"></i> 6</span>
+                                            <span><i class="ri-git-branch-line me-1"></i> 3</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <span class="text-muted" style="font-size: 11px;">Updated 2 weeks ago</span>
+                                            <a href="https://github.com/yash1880" target="_blank" class="btn btn-sm btn-outline-dark rounded-pill px-3 py-1 x-small fw-semibold">View Project</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 11. PROJECT QUALITY SNAPSHOT -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-pulse-line text-success me-2"></i> Project Quality Snapshot</h5>
+                        <div class="row g-3 text-center">
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h3 class="fw-bold text-dark mb-0">8</h3>
+                                    <span class="text-muted x-small">Total Projects</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h3 class="fw-bold text-dark mb-0">3</h3>
+                                    <span class="text-muted x-small">Active Projects</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h3 class="fw-bold text-dark mb-0">2</h3>
+                                    <span class="text-muted x-small">Recently Updated</span>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="p-3 border rounded-3 bg-light">
+                                    <h3 class="fw-bold text-dark mb-0">5</h3>
+                                    <span class="text-muted x-small">Languages Used</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. CAREER GOAL TRACKER -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+                            <div>
+                                <h5 class="fw-bold text-dark mb-1"><i class="ri-flag-line text-primary me-2"></i> My Career Goal</h5>
+                                <span class="text-muted small">Target Role: <strong>Frontend Developer</strong> | Target Date: <strong>December 2026</strong></span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">Update Goal</button>
+                        </div>
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between small fw-semibold mb-1">
+                                <span>Goal Progress (68%)</span>
+                                <span class="text-primary">Remaining Milestones: 3</span>
+                            </div>
+                            <div class="progress rounded-pill" style="height: 8px;">
+                                <div class="progress-bar bg-primary rounded-pill" style="width: 68%;"></div>
+                            </div>
+                        </div>
+                        <div class="text-muted x-small mt-2">Next Milestone: Complete advanced React Redux state management module.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 13. RECOMMENDED FOR YOU -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-compass-3-line text-warning me-2"></i> Recommended For You</h5>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <span class="badge bg-primary-subtle text-primary mb-2 x-small">Matching Internship</span>
+                                        <h6 class="fw-bold text-dark small mb-1">Frontend React Internship</h6>
+                                        <p class="text-muted x-small mb-3">WebCraft Digital • Ahmedabad</p>
+                                    </div>
+                                    <a href="/internships" class="btn btn-sm btn-outline-primary rounded-pill w-100 x-small fw-semibold">View Internship</a>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <span class="badge bg-success-subtle text-success mb-2 x-small">Recommended Skill</span>
+                                        <h6 class="fw-bold text-dark small mb-1">Learn TypeScript</h6>
+                                        <p class="text-muted x-small mb-3">Crucial for modern senior frontend roles.</p>
+                                    </div>
+                                    <a href="/roadmap" class="btn btn-sm btn-outline-success rounded-pill w-100 x-small fw-semibold">Start Learning</a>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <span class="badge bg-warning-subtle text-warning text-dark mb-2 x-small">Recommended Project</span>
+                                        <h6 class="fw-bold text-dark small mb-1">E-Commerce Redux Store</h6>
+                                        <p class="text-muted x-small mb-3">Add to GitHub portfolio to boost visibility.</p>
+                                    </div>
+                                    <a href="/roadmap" class="btn btn-sm btn-outline-warning text-dark rounded-pill w-100 x-small fw-semibold">Build Project</a>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="p-3 border rounded-4 bg-light h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <span class="badge bg-info-subtle text-info mb-2 x-small">Interview Practice</span>
+                                        <h6 class="fw-bold text-dark small mb-1">JavaScript Hooks Q&A</h6>
+                                        <p class="text-muted x-small mb-3">Practice voice mock interview session.</p>
+                                    </div>
+                                    <a href="/ai/mock-interview" class="btn btn-sm btn-outline-info rounded-pill w-100 x-small fw-semibold">Practice Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 14. COMMUNITY / PEER ACTIVITY -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <h5 class="fw-bold text-dark mb-3"><i class="ri-team-line text-primary me-2"></i> Community & Peer Activity</h5>
+                        <div class="list-group list-group-flush gap-2">
+                            <div class="list-group-item border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold small" style="width: 32px; height: 32px;">A</div>
+                                    <div>
+                                        <span class="small fw-semibold text-dark">Aarav M. started the MERN Stack Advanced Learning Roadmap.</span>
+                                        <span class="text-muted x-small d-block">2 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold small" style="width: 32px; height: 32px;">P</div>
+                                    <div>
+                                        <span class="small fw-semibold text-dark">Priya S. successfully completed the React.js Assessment (95%).</span>
+                                        <span class="text-muted x-small d-block">5 hours ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="list-group-item border rounded-3 p-3 bg-light d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center fw-bold small" style="width: 32px; height: 32px;">R</div>
+                                    <div>
+                                        <span class="small fw-semibold text-dark">Rohan K. cleared the AI Mock Interview practice session.</span>
+                                        <span class="text-muted x-small d-block">1 day ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 15. SMART WEEKLY SUMMARY -->
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-bold text-dark mb-0"><i class="ri-calendar-event-line text-info me-2"></i> Your Week in Career Progress</h5>
+                            <span class="badge bg-info-subtle text-info">Week 38 Summary</span>
+                        </div>
+                        <div class="row g-3 text-center mb-3">
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">12%</span>
+                                    <span class="text-muted x-small">Skills Improved</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">Roadmap</span>
+                                    <span class="text-muted x-small">Active Progress</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">2 Apps</span>
+                                    <span class="text-muted x-small">Submitted</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">3 Sessions</span>
+                                    <span class="text-muted x-small">Mock Interviews</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">Optimized</span>
+                                    <span class="text-muted x-small">Resume Activity</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-4">
+                                <div class="p-2 border rounded-3 bg-light">
+                                    <span class="d-block fw-bold text-dark">7 Days</span>
+                                    <span class="text-muted x-small">Learning Streak</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-0 text-center">Great consistency this week! You're ahead of 85% of active students in your learning path.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<style>
+    .x-small { font-size: 0.75rem; }
+    .tool-card {
+        transition: all 0.2s ease-in-out;
+    }
+    .tool-card:hover {
+        background-color: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-2px);
+    }
+    .custom-sidebar-link:hover {
+        background-color: #f1f5f9;
+        color: #0d6efd !important;
+    }
+</style>

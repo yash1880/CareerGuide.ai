@@ -1,0 +1,215 @@
+<%- include('partials/header') %>
+
+    <%- include('partials/sidebar') %>
+    <div class="sidebar-page-content">
+
+    <main class="container-fluid py-4 px-4">
+        <!-- Header Banner -->
+        <div class="row mb-4 align-items-center app-page-heading">
+            <div class="col-md-8">
+                <h2 class="fw-bold text-dark mb-1"><i class="ri-briefcase-4-fill text-primary me-2"></i> Explore Jobs & Internships</h2>
+                <p class="text-muted small mb-0">Discover top roles and startup internships tailored for your MERN Stack & Full-Stack skills.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <span class="badge bg-primary px-3 py-2 rounded-pill fw-semibold" id="openingsCount"><%= jobs.length %> Openings Available</span>
+            </div>
+        </div>
+
+        <div id="applicationMessage" class="alert d-none" role="status" aria-live="polite"></div>
+
+        <!-- Search & Filter Bar with Search Button -->
+        <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+            <div class="row g-3">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="ri-search-line text-muted"></i></span>
+                        <input type="text" id="searchInput" class="form-control bg-light border-0 shadow-none py-2" placeholder="Search title, skill or company...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select id="locationFilter" class="form-select bg-light border-0 shadow-none py-2">
+                        <option value="">All Locations / Remote</option>
+                        <option value="surat">Surat</option>
+                        <option value="ahmedabad">Ahmedabad</option>
+                        <option value="remote">Remote</option>
+                        <option value="mumbai">Mumbai</option>
+                        <option value="pune">Pune</option>
+                        <option value="bangalore">Bangalore</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select id="typeFilter" class="form-select bg-light border-0 shadow-none py-2">
+                        <option value="">All Types</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="internship">Internship</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button id="searchBtn" class="btn btn-primary w-100 py-2 rounded-3 fw-semibold shadow-sm">
+                        <i class="ri-search-line me-1"></i> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Job Cards List -->
+        <div class="row g-4" id="jobsContainer">
+            <% if (jobs && jobs.length > 0) { %>
+                <% jobs.forEach(job => { %>
+                    <div class="col-lg-4 col-md-6 job-card-wrapper" 
+                         data-title="<%= job.title.toLowerCase() %>" 
+                         data-company="<%= job.company.toLowerCase() %>" 
+                         data-location="<%= job.location.toLowerCase() %>" 
+                         data-type="<%= job.type.toLowerCase().trim() %>"
+                         data-description="<%= job.description.toLowerCase() %>">
+                        <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white d-flex flex-column justify-content-between custom-card-hover">
+                            <div>
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="bg-light p-3 rounded-4 text-primary fw-bold fs-5 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="ri-building-line"></i>
+                                    </div>
+                                    <span class="badge bg-light text-dark border fw-semibold px-2 py-1"><%= job.type %></span>
+                                </div>
+                                <h5 class="fw-bold mb-1"><a class="text-dark text-decoration-none" href="/jobs/<%= job._id %>"><%= job.title %></a></h5>
+                                <p class="text-primary small fw-semibold mb-2"><%= job.company %></p>
+                                <p class="text-muted small mb-3"><%= job.description %></p>
+                            </div>
+                            
+                            <div>
+                                <div class="d-flex align-items-center gap-2 text-muted small mb-3">
+                                    <span><i class="ri-map-pin-line me-1"></i> <%= job.location %></span>
+                                    <span>•</span>
+                                    <span class="fw-bold text-success"><%= job.salary %></span>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                                    <span class="text-muted" style="font-size: 11px;"><%= job.postedDate %></span>
+                                    <div class="d-flex gap-2">
+                                        <a href="/jobs/<%= job._id %>" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold">View Details</a>
+                                        <button type="button" class="btn btn-primary btn-sm px-3 rounded-pill fw-semibold shadow-sm track-job-application" data-id="<%= job._id %>" data-apply-link="<%= job.applyLink %>">Apply Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <div class="col-12 text-center py-5" id="noResults">
+                    <p class="text-muted">No job openings found right now.</p>
+                </div>
+            <% } %>
+        </div>
+        <div class="col-12 text-center py-5 d-none" id="noResultsDynamic">
+            <p class="text-muted fs-5"><i class="ri-search-eye-line me-2"></i> No matching jobs or internships found.</p>
+        </div>
+    </main>
+
+    <!-- Footer Include -->
+    <%- include('partials/footer') %>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+   <!-- Strict & Accurate Filtering Script -->
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const typeFilter = document.getElementById('typeFilter');
+        const searchBtn = document.getElementById('searchBtn');
+        const jobCards = document.querySelectorAll('.job-card-wrapper');
+        const noResultsDynamic = document.getElementById('noResultsDynamic');
+        const openingsCount = document.getElementById('openingsCount');
+        const applicationMessage = document.getElementById('applicationMessage');
+
+        document.querySelectorAll('.track-job-application').forEach((button) => {
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                try {
+                    const response = await fetch('/applications/api/apply', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ jobOrInternshipId: button.dataset.id, type: 'Job' })
+                    });
+                    const result = await response.json();
+                    applicationMessage.textContent = result.message || 'Unable to track this application.';
+                    applicationMessage.className = `alert ${response.ok || response.status === 409 ? 'alert-success' : 'alert-warning'}`;
+                    applicationMessage.classList.remove('d-none');
+                    if (response.ok || response.status === 409) {
+                        const applyLink = button.dataset.applyLink;
+                        if (applyLink && applyLink !== '#') {
+                            if (/^(https?:\/\/|\/)/i.test(applyLink)) {
+                                window.location.assign(new URL(applyLink, window.location.origin).href);
+                            } else {
+                                button.textContent = 'Application tracked';
+                            }
+                        } else {
+                            button.textContent = 'Application tracked';
+                        }
+                    }
+                } catch (error) {
+                    applicationMessage.textContent = 'Could not reach the server. Please try again.';
+                    applicationMessage.className = 'alert alert-danger';
+                    applicationMessage.classList.remove('d-none');
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+        function filterJobs() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const selectedLocation = locationFilter.value.toLowerCase();
+            const selectedType = typeFilter.value.toLowerCase().trim();
+
+            let visibleCount = 0;
+
+            jobCards.forEach(card => {
+                const title = card.getAttribute('data-title');
+                const company = card.getAttribute('data-company');
+                const location = card.getAttribute('data-location');
+                const type = card.getAttribute('data-type');
+
+                // Strict Search: Sirf Title ya Company match hone par hi true dega
+                const matchesSearch = searchTerm === '' || 
+                    title.includes(searchTerm) || 
+                    company.includes(searchTerm);
+
+                const matchesLocation = selectedLocation === '' || location.includes(selectedLocation);
+                
+                let matchesType = true;
+                if (selectedType !== '') {
+                    if (selectedType === 'full-time') {
+                        matchesType = type.includes('full-time');
+                    } else if (selectedType === 'internship') {
+                        matchesType = type.includes('internship');
+                    }
+                }
+
+                if (matchesSearch && matchesLocation && matchesType) {
+                    card.classList.remove('d-none');
+                    visibleCount++;
+                } else {
+                    card.classList.add('d-none');
+                }
+            });
+
+            openingsCount.innerText = `${visibleCount} Openings Available`;
+
+            if (visibleCount === 0) {
+                noResultsDynamic.classList.remove('d-none');
+            } else {
+                noResultsDynamic.classList.add('d-none');
+            }
+        }
+
+        // Live typing aur dropdown change par instant filtering
+        searchInput.addEventListener('input', filterJobs);
+        locationFilter.addEventListener('change', filterJobs);
+        typeFilter.addEventListener('change', filterJobs);
+        
+        searchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            filterJobs();
+        });
+    </script>
+</body>
+</html>
