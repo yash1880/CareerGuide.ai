@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import { GoogleGenAI } from '@google/genai';
 import { extname } from 'node:path';
-import { PDFParse } from 'pdf-parse';
+
 import mammoth from 'mammoth';
 import AtsResult from '../models/AtsResult.js';
+
+const { PDFParse } = await import('pdf-parse');
 
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const MAX_RESUME_TEXT_LENGTH = 100_000;
